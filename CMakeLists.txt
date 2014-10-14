@@ -5,6 +5,8 @@ include(NanogearVersion)
 
 message(STATUS "This is Nanogear ${NANOGEAR_MAJOR}.${NANOGEAR_MINOR}.${NANOGEAR_PATCH}")
 
+option(WITH_EXAMPLES "WITH_EXAMPLES" OFF)
+
 find_package(Libmagic REQUIRED)
 
 find_package(Qt4 REQUIRED)
@@ -47,6 +49,6 @@ endif (${PEDANTIC})
 #
 add_subdirectory(src)
 
-if (${WITH_EXAMPLES})
+#if (${WITH_EXAMPLES})
     add_subdirectory(examples)
-endif (${WITH_EXAMPLES})
+    #endif (${WITH_EXAMPLES})
