@@ -24,7 +24,7 @@
 #ifndef NPROTOCOL_H
 #define	NPROTOCOL_H
 
-#include <QString>
+#include <string>
 
 #include "nmetadata.h"
 
@@ -42,13 +42,13 @@ public:
     /*!
      * @param name The protocol's name
      */
-    NProtocol(const QString& name) : NMetadata(name), m_defaultPort(0) {}
+	NProtocol(const std::string& name) : NMetadata(name), m_defaultPort(0) {}
 
     /*!
      * @param name The protocol's name
      * @param description The protocol's description
      */
-    NProtocol(const QString& name, const QString& description) : NMetadata(name, description),
+    NProtocol(const std::string& name, const std::string& description) : NMetadata(name, description),
         m_defaultPort(0) {}
 
     /*!
@@ -56,7 +56,7 @@ public:
      * @param description The protocol's description
      * @param defaultPort The protocol's default port
      */
-    NProtocol(const QString& name, const QString& description, int defaultPort) :
+    NProtocol(const std::string& name, const std::string& description, int defaultPort) :
         NMetadata(name, description), m_defaultPort(defaultPort) {}
 
     /*!
@@ -65,7 +65,7 @@ public:
      * @param description The protocol's description
      * @param defaultPort The protocol's default port
      */
-    NProtocol(const QString& schemeName, const QString& name, const QString& description,
+    NProtocol(const std::string& schemeName, const std::string& name, const std::string& description,
             int defaultPort) : NMetadata(name, description), m_schemeName(schemeName),
             m_defaultPort(defaultPort) {}
 
@@ -74,7 +74,7 @@ public:
     * @param name The protocol's name
     * @param description The protocol's description
     */
-    NProtocol(const QString& schemeName, const QString& name, const QString& description) :
+    NProtocol(const std::string& schemeName, const std::string& name, const std::string& description) :
            NMetadata(name, description), m_schemeName(schemeName) {}
 
     bool operator==(const NProtocol& other) const;
@@ -88,7 +88,7 @@ public:
     //! The file protocol used for local resources
     static const NProtocol FILE;
 private:
-    QString m_schemeName;
+    std::string m_schemeName;
     int m_defaultPort;
 };
 

@@ -31,6 +31,35 @@
 #include <npreference.h>
 #include <npreferencelist.h>
 
+/**! 
+ * Implicit converter to DRY up getPreferenceListFromHeader
+ */
+namespace utility
+{
+	namespace implicit
+	{
+		template<typename T>
+		struct ArgConverter
+		{
+			ArgConverter(const T& type) : m_member(type) {};
+			
+			operator T () { return m_member; }
+			
+			T m_member;
+		};
+
+		template<>
+		struct ArgConverter<NMimeType>
+		{
+			ArgConverter(const QString& type) : m_member(type) {};
+			
+			operator NMimeType () { return NMimeType(m_member.toStdString()); }
+			
+			QString m_member;
+		};
+	}
+}
+
 /*!
  * Convert an HTTP header to a PreferenceList.
  * \arg h The value of an HTTP header.
@@ -43,7 +72,7 @@ NPreferenceList<T> getPreferenceListFromHeader(const QString& h)
     QString header = h;
     foreach(const QString& item, header.remove(" ").split(",")) {
         QStringList pair = item.split(";q=");
-        NPreference<T> preference(pair.at(0), pair.value(1, "1").toFloat());
+		NPreference<T> preference(utility::implicit::ArgConverter<T>(pair.at(0)), pair.value(1, "1").toFloat());
         accept.append(preference);
     }
 

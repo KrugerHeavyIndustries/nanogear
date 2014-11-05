@@ -24,8 +24,6 @@
 #ifndef NMETHOD_H
 #define NMETHOD_H
 
-#include <QString>
-
 #include "nmetadata.h"
 
 /*!
@@ -38,9 +36,9 @@
 class NMethod : public NMetadata {
 public:
 
-    NMethod(const QString& name) : NMetadata(name) {}
+	NMethod(const std::string& name) : NMetadata(name) {}
 
-    NMethod(const QString& name, const QString& description) : NMetadata(name, description) {}
+    NMethod(const std::string& name, const std::string& description) : NMetadata(name, description) {}
 
     bool operator==(const NMethod& type) const;
 
@@ -51,7 +49,7 @@ public:
      * \return An instance of the default methods provided, otherwise a new NMethod instance with
      *      methodName as name (normalized to upper case)
      */
-    static NMethod valueOf(const QString& methodName);
+    static NMethod valueOf(const std::string& methodName);
 
     /*!
      * \return true if this method has a body

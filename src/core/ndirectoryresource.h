@@ -27,6 +27,8 @@
 #include <QDir>
 #include <QString>
 
+#include <unordered_map>
+
 #include "nresource.h"
 #include "nrepresentation.h"
 
@@ -50,32 +52,32 @@ class NResponse;
 class NDirectoryResource : public NResource
 {
 public:
-    NDirectoryResource(const QString& root);
+	NDirectoryResource(const std::string& root);
 
     /*!
      * Set the root directory on the filesystem
      * \param root An absolute or relative path to a directory on the filesystem
      */
-    void setRoot(const QString& root)
-    { m_root = QDir(root); }
+    void setRoot(const std::string& root)
+	{ m_root = QDir(QString::fromStdString(root)); }
 
     /*!
      * \return The absolute path to the root directory
      */
-    QString root() const
-    { return m_root.absolutePath(); }
+    std::string root() const
+    { return m_root.absolutePath().toStdString(); }
 
     /*!
      * Set the index file name
      * \param indexName Index file name
      */
-    void setIndexName(const QString& indexName)
+    void setIndexName(const std::string& indexName)
     { m_indexName = indexName; }
 
     /*!
      * \return The index file name
      */
-    const QString& indexName() const
+    const std::string& indexName() const
     { return m_indexName; }
 
     /*!
@@ -95,7 +97,7 @@ public:
     /*!
      * \return a modifiable QHash mapping file extensions to MIME types
      */
-    QHash<QString, QString>& mimeMappings()
+	std::unordered_map<std::string, std::string>& mimeMappings()
     { return m_mimeMappings; }
 
 protected:
@@ -118,9 +120,9 @@ private:
 
     QDir m_root;
     bool m_indexAllowed;
-    QString m_indexName;
-    QString m_xhtmlRepr;
-    QHash<QString, QString> m_mimeMappings;
+	std::string m_indexName;
+    std::string m_xhtmlRepr;
+	std::unordered_map<std::string, std::string> m_mimeMappings;
 
     NRepresentation m_notAllowed;
     NRepresentation m_directoryIndex;

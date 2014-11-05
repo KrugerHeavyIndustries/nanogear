@@ -54,7 +54,7 @@ public:
      * \param name The status name
      * \param description Short status description
      */
-    NStatus(int code, const QString& name, const QString& description) :
+    NStatus(int code, const std::string& name, const std::string& description) :
         NMetadata(name, description), m_code(code) {}
 
     /*!

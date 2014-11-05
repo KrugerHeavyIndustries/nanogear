@@ -24,6 +24,8 @@
 
 #include "nmethod.h"
 
+#include <algorithm>
+
 // Inizialize constants
 const NMethod NMethod::CONNECT("CONNECT", "Used with a proxy that can dynamically switch to being "
         "a tunnel");
@@ -87,9 +89,13 @@ bool NMethod::hasBody() const
         return false;
 }
 
-NMethod NMethod::valueOf(const QString& methodName)
+NMethod NMethod::valueOf(const std::string& methodName)
 {
-    QString normalizedMethodName(methodName.toUpper());
+	std::string normalizedMethodName;
+	
+	std::transform(methodName.begin(), methodName.end(), normalizedMethodName.begin(), ::toupper);
+	
+	//std::string normalizedMethodName(methodName.toUpper());
 
     if (normalizedMethodName == "CONNECT")
         return NMethod::CONNECT;

@@ -23,16 +23,14 @@
 
 #include "nmimetype.h"
 
-#include <QString>
-
-void NMimeType::fromString(const QString& type)
+void NMimeType::fromString(const std::string& type)
 {
     m_whole = type;
     m_type.clear();
     m_subtype.clear();
 }
 
-const QString& NMimeType::toString() const
+const std::string& NMimeType::toString() const
 {
     return m_whole;
 }
@@ -45,28 +43,27 @@ bool NMimeType::operator==(const NMimeType& type) const
 
 bool NMimeType::isConcrete() const
 {
-    return !m_whole.contains("*");
+	return m_whole.find("*") == std::string::npos;
 }
 
 
-const QString& NMimeType::type() const
+const std::string& NMimeType::type() const
 {
-    if (m_type.isEmpty())
-        const_cast<NMimeType*>(this)->m_type = m_whole.left(m_whole.indexOf('/'));
+    if (m_type.empty())
+        const_cast<NMimeType*>(this)->m_type = m_whole.substr(0, m_whole.find_first_of('/'));
 
     return m_type;
 }
 
-const QString& NMimeType::subtype() const
+const std::string& NMimeType::subtype() const
 {
-    if (m_type.isEmpty())
-        const_cast<NMimeType*>(this)->m_subtype = m_whole.right(m_whole.indexOf('/'));
+    if (m_type.empty())
+        const_cast<NMimeType*>(this)->m_subtype = m_whole.substr(m_whole.find_first_of('/'));
 
     return m_subtype;
 }
 
 bool NMimeType::isCompatible(const NMimeType& other) const
 {
-    return other.m_whole.contains(m_whole) || \
-           m_whole.contains(other.m_whole);
+	return other.m_whole.find(m_whole) != std::string::npos || m_whole.find(other.m_whole) != std::string::npos;
 }

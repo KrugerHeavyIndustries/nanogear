@@ -66,7 +66,7 @@ public:
      * \return the data (in raw form) attached to this representation
      */
     QByteArray data(const NMimeType& mimeType) const
-    { return QMimeData::data(mimeType.toString()); }
+	{ return QMimeData::data(QString::fromStdString(mimeType.toString())); }
 
     /*!
      * An overloaded function provided for convenience
@@ -74,13 +74,13 @@ public:
      * \param data A reference to the raw data
      */
     void setData(const NMimeType& mimeType, const QByteArray& data)
-    { QMimeData::setData(mimeType.toString(), data); }
+    { QMimeData::setData(QString::fromStdString(mimeType.toString()), data); }
 
     /*!
      * \return true if the requested format is available
      */
     bool hasFormat(const NMimeType& mimeType) const
-    { return QMimeData::hasFormat(mimeType.toString()); }
+    { return QMimeData::hasFormat(QString::fromStdString(mimeType.toString())); }
 
     /*!
      * A facility to easily add Xhtml content to this representation

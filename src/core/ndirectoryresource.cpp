@@ -27,10 +27,13 @@
 #include <QFile>
 #include <QFileInfo>
 
+#include <sstream>
+#include <unordered_map>
+
 #include "nrequest.h"
 #include "nresponse.h"
 
-NDirectoryResource::NDirectoryResource(const QString& root) : m_root(root), m_indexAllowed(false)
+NDirectoryResource::NDirectoryResource(const std::string& root) : m_root(QString::fromStdString(root)), m_indexAllowed(true)
 {
     m_notAllowed.setData("<html><head><title>403 Forbidden</title></head><body>"
                          "<h1>Forbidden</h1>"
@@ -79,18 +82,18 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
 
     if (pathInfo.exists()) {
         if (pathInfo.isDir()) {
-            QFileInfo indexFileInfo(pathInfo.absoluteFilePath() + "/" + m_indexName);
+			QFileInfo indexFileInfo(pathInfo.absoluteFilePath() + "/" + QString::fromStdString(m_indexName));
 
             if (indexFileInfo.exists() && indexFileInfo.isFile()) {
                 representFile(indexFileInfo, response);
             } else if (m_indexAllowed) {
                 // Return an HTML representation of this directory
 
-                QString htmlTableEntries;
+				std::ostringstream htmlTableEntries;
                 foreach(const QFileInfo& dirFileInfo, QDir(pathInfo.absoluteFilePath()).entryInfoList()) {
-                    QString fileType("File");
-                    QString dirIdentifier("");
-                    QString size(QString::number(dirFileInfo.size()));
+                    std::string fileType("File");
+                    std::string dirIdentifier("");
+                    std::string size(QString::number(dirFileInfo.size()).toStdString());
 
                     if (dirFileInfo.isDir()) {
                         fileType = "Directory";
@@ -98,14 +101,20 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
                         size = "-";
                     }
 
-                    htmlTableEntries += QString("<tr><td class=\"n\"><a href=\"%1\">%2</a>%3</td><td class=\"m\">%4</td><td class=\"s\">%5</td><td class=\"t\">%6</td></tr>\n")
-                                        .arg(pathInfo.fileName() + "/" + dirFileInfo.fileName())
-                                        .arg(dirFileInfo.fileName()).arg(dirIdentifier)
-                                        .arg(dirFileInfo.lastModified().toString()).arg(size)
-                                        .arg(fileType);
+					std::string arg1 = (pathInfo.fileName() + "/" + dirFileInfo.fileName()).toStdString();
+					std::string arg2 = dirFileInfo.fileName().toStdString();
+					std::string arg3 = dirIdentifier;
+					
+					htmlTableEntries <<	"<tr>"
+										"<td class=\"n\"><a href=\"" << arg1 << "\">" << arg2 << "</a>" << arg3 << "</td>" <<
+										"<td class=\"m\">" << dirFileInfo.lastModified().toString().toStdString() << "</td>" <<
+										"<td class=\"s\">" << size << "</td>" <<
+										"<td class=\"t\">" << fileType << "</td>"
+										"</tr>\n";
+
                 }
 
-                m_directoryIndex.setXhtml(m_xhtmlRepr.arg(pathInfo.fileName()).arg(htmlTableEntries));
+				m_directoryIndex.setXhtml(QString::fromStdString(m_xhtmlRepr).arg(pathInfo.fileName()).arg(QString::fromStdString(htmlTableEntries.str())));
 
                 response.setStatus(NStatus::SUCCESS_OK);
                 response.setRepresentation(&m_directoryIndex);
@@ -128,16 +137,16 @@ void NDirectoryResource::representFile(const QFileInfo& pathInfo, NResponse& res
     //! \todo: Create a thin layer over libmagic?
     magic_t magicCookie = magic_open(MAGIC_MIME_TYPE | MAGIC_SYMLINK | MAGIC_ERROR);
     magic_load(magicCookie, NULL);
-    QString mimeType(magic_file(magicCookie, pathInfo.absoluteFilePath().toLatin1().data()));
+	std::string mimeType(magic_file(magicCookie, pathInfo.absoluteFilePath().toStdString().c_str()));
     magic_close(magicCookie);
 
     // If libmagic faild to find the MIME type, we query for custom-mapped extensions
     // if none is found we return a generic "application/octet-stream" MIME type
 
-    if (mimeType.isEmpty()) {
-        QString customMapping(m_mimeMappings.value(pathInfo.completeSuffix()));
+    if (mimeType.empty()) {
+		std::string customMapping(m_mimeMappings.find(pathInfo.completeSuffix().toStdString())->first);
 
-        if (!customMapping.isEmpty())
+        if (!customMapping.empty())
             mimeType = customMapping;
         else
             mimeType = "application/octet-stream";
@@ -147,7 +156,7 @@ void NDirectoryResource::representFile(const QFileInfo& pathInfo, NResponse& res
     QFile file(pathInfo.absoluteFilePath());
 
     file.open(QIODevice::ReadOnly);
-    m_rawFile.setData(mimeType, file.readAll());
+    m_rawFile.setData(mimeType.c_str(), file.readAll());
     file.close();
 
     response.setStatus(NStatus::SUCCESS_OK);

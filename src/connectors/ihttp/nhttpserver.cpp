@@ -75,7 +75,7 @@ void NHTTPServer::onClientReadyRead()
     qDebug() << Q_FUNC_INFO << "Requested path: " << requestHeader.path();
 
     // Fill Method by using informations supplied by the client
-    NMethod requestedMethod = NMethod::valueOf(requestHeader.method().toUpper());
+    NMethod requestedMethod = NMethod::valueOf(requestHeader.method().toUpper().toStdString());
 
     //
     // Get the entity
@@ -87,7 +87,7 @@ void NHTTPServer::onClientReadyRead()
     else if (requestedMethod.hasBody())
         entityBody = m_clientSocket->readAll();
 
-    NRepresentation entity(entityBody, requestHeader.value("Content-Type"));
+    NRepresentation entity(entityBody, requestHeader.value("Content-Type").toStdString());
 
     NPreferenceList<NMimeType> acceptedMimeTypes(
         getPreferenceListFromHeader<NMimeType>(requestHeader.value("Accept")));
@@ -128,7 +128,7 @@ void NHTTPServer::onClientReadyRead()
     }
 
     // Fill Request object
-    NRequest request(requestHeader.method(), clientInfo, &entity);
+    NRequest request(requestHeader.method().toStdString(), clientInfo, &entity);
 
     request.setResourceRef(queryString.path());
 
@@ -160,7 +160,7 @@ void NHTTPServer::onClientReadyRead()
     /// \note Unused
     //QTextCodec* codec = clientInfo.acceptedTextCodecs().top();
 
-    QHttpResponseHeader responseHeader(response.status().code(), response.status().name(),
+	QHttpResponseHeader responseHeader(response.status().code(), QString::fromStdString(response.status().name()),
                                        requestHeader.majorVersion(), requestHeader.minorVersion());
 
     responseHeader.setValue("Connection", requestHeader.value("Connection"));
@@ -183,10 +183,10 @@ void NHTTPServer::onClientReadyRead()
     if (representation != 0) { // the resource may or may not return a representation
         if (representation->formats().count() == 1) {
             responseHeader.setContentType(representation->formats().at(0));
-            responseData = representation->data(representation->formats().at(0));
+            responseData = representation->data(representation->formats().at(0).toStdString());
         } else {
-            responseHeader.setContentType(representation->format(clientInfo.acceptedMimeTypes())
-                                          .toString());
+			responseHeader.setContentType(QString::fromStdString(representation->format(clientInfo.acceptedMimeTypes())
+                                          .toString()));
             responseData = representation->data(clientInfo.acceptedMimeTypes());
         }
     }

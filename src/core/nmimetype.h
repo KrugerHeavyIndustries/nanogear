@@ -24,7 +24,7 @@
 #ifndef NMIMETYPE_H
 #define NMIMETYPE_H
 
-#include <QString>
+#include <string>
 
 /*!
  * \class NMimeType
@@ -47,7 +47,7 @@ public:
      * a MIME type
      * \param type A string representation of the MIME type
      */
-    NMimeType(const QString& type) :
+	NMimeType(const std::string& type) :
             m_whole(type), m_type("*"), m_subtype("*") {}
 
     /*!
@@ -61,12 +61,12 @@ public:
      * Build this MimeType object from its string representation
      * \param type A string representation of the MIME type
      */
-    void fromString(const QString& type);
+    void fromString(const std::string& type);
 
     /*!
      * \return The string representation of this MimeType object
      */
-    const QString& toString() const;
+    const std::string& toString() const;
 
     bool operator==(const NMimeType& type) const;
 
@@ -81,14 +81,14 @@ public:
      * of a MIME type
      * \return the MIME type
      */
-    const QString& type() const;
+    const std::string& type() const;
 
     /*!
      * This is the part after the backslash in a string representation of a MIME
      * type
      * \return the MIME subtype
      */
-    const QString& subtype() const;
+    const std::string& subtype() const;
 
     /*!
      * Check if two MIME types are compatible
@@ -97,9 +97,9 @@ public:
     bool isCompatible(const NMimeType&) const;
 
 private:
-    QString m_whole;
-    QString m_type;
-    QString m_subtype;
+    std::string m_whole;
+    std::string m_type;
+    std::string m_subtype;
 };
 
 #endif /* NMIMETYPE_H */

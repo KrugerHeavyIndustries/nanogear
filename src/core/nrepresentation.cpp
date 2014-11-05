@@ -138,15 +138,14 @@ void NRepresentation::setXhtml(const QString& xhtml)
     ELEMENT_EMPTY("param");
 #undef ELEMENT_EMPTY
 
-
     setHtml(html);
 }
 
 QList<NMimeType> NRepresentation::mimeTypeFormats() const
 {
     QList<NMimeType> types;
-    foreach(const QString& type, QMimeData::formats())
-    types.append(type);
+	foreach(const QString& type, QMimeData::formats())
+	types.append(type.toStdString());
     return types;
 }
 
