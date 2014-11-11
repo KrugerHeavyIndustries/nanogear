@@ -24,8 +24,6 @@
 #ifndef NSTATUS_H
 #define NSTATUS_H
 
-#include <QString>
-
 #include "nmetadata.h"
 
 /*!

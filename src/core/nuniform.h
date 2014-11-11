@@ -25,7 +25,6 @@
 #define NUNIFORM_H
 
 #include <QObject>
-#include <QString>
 
 #include "nstatus.h"
 #include "nresponse.h"
@@ -109,7 +108,7 @@ protected:
 
 private:
     bool m_started;
-    QString m_resourceUri;
+    std::string m_resourceUri;
 };
 
 

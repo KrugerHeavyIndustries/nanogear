@@ -25,9 +25,9 @@
 #define NREQUEST_H
 
 #include <QObject>
-#include <QHash>
-#include <QString>
 #include <QByteArray>
+
+#include <unordered_map>
 
 #include "nmethod.h"
 #include "nclientinfo.h"
@@ -127,20 +127,20 @@ public:
     /*!
      * \param parameters Set the request parameter
      */
-    void setParameters(const QHash<QString, QString>& parameters)
+   void setParameters(const std::unordered_map<std::string, std::string>& parameters)
     { m_parameters = parameters; }
 
     /*!
      * \return The request parameters
      */
-    const QHash<QString, QString>& parameters() const
+    const std::unordered_map<std::string, std::string>& parameters() const
     { return m_parameters; }
 
 private:
     NMethod m_method;
     NClientInfo m_clientInfo;
     QString m_resourceRef;
-    QHash<QString, QString> m_parameters;
+    std::unordered_map<std::string, std::string> m_parameters;
     NRepresentation* m_representation;
 };
 

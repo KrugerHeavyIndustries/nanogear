@@ -94,8 +94,6 @@ NMethod NMethod::valueOf(const std::string& methodName)
 	std::string normalizedMethodName;
 	
 	std::transform(methodName.begin(), methodName.end(), normalizedMethodName.begin(), ::toupper);
-	
-	//std::string normalizedMethodName(methodName.toUpper());
 
     if (normalizedMethodName == "CONNECT")
         return NMethod::CONNECT;

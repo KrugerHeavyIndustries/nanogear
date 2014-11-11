@@ -107,7 +107,7 @@ void NHTTPServer::onClientReadyRead()
     /* ***************************************************************
      * Query strings
      * ***************************************************************/
-    QHash<QString, QString> parameters;
+   std::unordered_map<std::string, std::string> parameters;
 
     // Overcome the limitations of the Q_FOREACH macro
     typedef QPair<QByteArray, QByteArray> KeyValuePair;
@@ -115,7 +115,7 @@ void NHTTPServer::onClientReadyRead()
     QUrl queryString(requestHeader.path());
 
     foreach(const KeyValuePair& keyValue, queryString.encodedQueryItems()) {
-        parameters[keyValue.first] = keyValue.second;
+       parameters[std::string(keyValue.first.data())] = std::string(keyValue.second.data());
     }
 
     // Handle POST query string
@@ -123,7 +123,7 @@ void NHTTPServer::onClientReadyRead()
         //             ↓ workaround to get QUrl recognize a query string
         QUrl formData("?" + entity.data("application/x-www-form-urlencoded"));
         foreach(const KeyValuePair& keyValue, formData.encodedQueryItems()) {
-            parameters[keyValue.first] = keyValue.second;
+           parameters[std::string(keyValue.first.data())] = std::string(keyValue.second.data());
         }
     }
 

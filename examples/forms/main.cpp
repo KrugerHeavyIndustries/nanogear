@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QString>
 #include <QDebug>
 
 #include <NApplication>
@@ -27,15 +26,24 @@
 #include <NRepresentation>
 #include <ihttp/NHTTPServer>
 
+#include <iostream>
+#include <sstream>
+
+namespace std {
+   ostream& operator <<(ostream& os, const pair<string, string>& p) {
+      return os << p.first << " = " << p.second << "<br/>\n";
+   }
+}
+
 class FormsExample : public NResource {
 public:
     virtual void handleGet(const NRequest& request, NResponse& response) {
-        QString parametersString;
-        foreach (const QString& key, request.parameters().keys()) {
-            parametersString += (key + " = " + request.parameters()[key] + "<br/>\n");
-        }
+       std::ostringstream parametersString;
+       std::copy(request.parameters().begin(), request.parameters().end(), std::ostream_iterator<std::pair<std::string, std::string> >(parametersString));
 
-        m_representation.setHtml(QString("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+       std::ostringstream html;
+       html <<
+"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n"
 "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n"
 "<head>\n"
@@ -58,13 +66,14 @@ public:
 "<input type=\"submit\" value=\"Submit\" />\n"
 "</form>\n"
 "<hr/>\n"
-"Method: %1<br/>\n"
-"Args:<br/><br/>\n"
-"%2\n"
+"Method: " << request.method().name() << "<br/>\n"
+"Args:<br/><br/>\n" << parametersString.str() << "\n"
 "<hr/>\n"
 "</body>\n"
-"</html>\n").arg(request.method().name()).arg(parametersString));
+"</html>\n";
 
+        m_representation.setHtml(QString::fromStdString(html.str()));
+       
         response.setStatus(NStatus::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
@@ -73,6 +82,7 @@ public:
         handleGet(request, response);
     }
 private:
+   
     NRepresentation m_representation;
 };
 
