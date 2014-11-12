@@ -22,20 +22,16 @@
  */
 
 #include "nrouter.h"
-
-#include <QDebug>
-
 #include "nrequest.h"
 #include "nresponse.h"
 
 NRouter::~NRouter()
 {
-    QHash<QString, QPointer<NResource> >::ConstIterator it;
-
+    std::unordered_map<std::string, NResource*>::iterator it;
     for (it = m_routes.begin(); it != m_routes.end(); ++it) {
-        if (!it->isNull()) {
-            qDebug() << Q_FUNC_INFO << "Deleting resource attached to" << it.key();
-            delete(*it);
+        if (it->second != NULL) {
+            //qDebug() << Q_FUNC_INFO << "Deleting resource attached to" << it.key();
+            delete(it->second);
         }
     }
 }
@@ -45,16 +41,15 @@ void NRouter::handleRequest(const NRequest& request, NResponse& response)
 {
     bool found = false;
 
-    if (!m_routes.value(request.resourceRef()).isNull()) {
+    if (m_routes.find(request.resourceRef()) != m_routes.end()) {
         // Direct match found, get the class pointer and make it handle the request
-        qDebug() << Q_FUNC_INFO << "Found a direct match with requested path ("
-        << request.resourceRef() << ")";
-        m_routes.value(request.resourceRef())->handleRequest(request, response);
+        //qDebug() << Q_FUNC_INFO << "Found a direct match with requested path ("<< request.resourceRef() << ")";
+        m_routes[request.resourceRef()]->handleRequest(request, response);
         found = true;
     }
 
     if (!found) {
-        qDebug() << Q_FUNC_INFO << "Couldn't find any direct match (404)";
+        //qDebug() << Q_FUNC_INFO << "Couldn't find any direct match (404)";
         response.setStatus(NStatus::CLIENT_ERROR_NOT_FOUND);
         response.setRepresentation(&m_notFound);
     }

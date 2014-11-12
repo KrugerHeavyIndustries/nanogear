@@ -36,8 +36,11 @@ class NRequest;
  * \brief Uniform interface common to all resource types
  */
 
-class NUniform : public QObject {
+class NUniform {
 protected:
+   
+    virtual ~NUniform() {};
+   
     /*!
      * Override this method in a derived class to handle a GET request.
      * By default this methods returns NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED
@@ -107,7 +110,7 @@ protected:
     { Q_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
 
 private:
-    bool m_started;
+   
     std::string m_resourceUri;
 };
 

@@ -78,7 +78,7 @@ NDirectoryResource::NDirectoryResource(const std::string& root) : m_root(QString
 
 void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
 {
-    QFileInfo pathInfo(m_root.absolutePath() + request.resourceRef());
+    QFileInfo pathInfo(m_root.absolutePath() + QString::fromStdString(request.resourceRef()));
 
     if (pathInfo.exists()) {
         if (pathInfo.isDir()) {

@@ -107,7 +107,7 @@ void NHTTPServer::onClientReadyRead()
     /* ***************************************************************
      * Query strings
      * ***************************************************************/
-   std::unordered_map<std::string, std::string> parameters;
+    std::unordered_map<std::string, std::string> parameters;
 
     // Overcome the limitations of the Q_FOREACH macro
     typedef QPair<QByteArray, QByteArray> KeyValuePair;
@@ -130,7 +130,7 @@ void NHTTPServer::onClientReadyRead()
     // Fill Request object
     NRequest request(requestHeader.method().toStdString(), clientInfo, &entity);
 
-    request.setResourceRef(queryString.path());
+    request.setResourceRef(queryString.path().toStdString());
 
     request.setParameters(parameters);
 

@@ -35,7 +35,6 @@ const std::string& NMimeType::toString() const
     return m_whole;
 }
 
-
 bool NMimeType::operator==(const NMimeType& type) const
 {
     return m_whole == type.m_whole;
@@ -45,7 +44,6 @@ bool NMimeType::isConcrete() const
 {
 	return m_whole.find("*") == std::string::npos;
 }
-
 
 const std::string& NMimeType::type() const
 {

@@ -24,9 +24,7 @@
 #ifndef NROUTER_H
 #define NROUTER_H
 
-#include <QHash>
-#include <QString>
-#include <QPointer>
+#include <unordered_map>
 
 #include "nresource.h"
 #include "nrepresentation.h"
@@ -67,17 +65,18 @@ public:
      * \param path The URI path on which the attached resource will respond to requests
      * \param resource A pointer to a Resource object
      */
-    void attach(const QString& path, QPointer<NResource> resource)
+    void attach(const std::string& path, NResource* resource)
     { m_routes[path] = resource; }
 
     /*!
      * \return A modifiable QHash representing the routes
      */
-    QHash<QString, QPointer<NResource> >& routes()
+   std::unordered_map<std::string, NResource*>& routes()
     { return m_routes; }
 
 private:
-    QHash<QString, QPointer<NResource> > m_routes;
+    std::unordered_map<std::string, NResource*> m_routes;
+   
     NRepresentation m_notFound;
 };
 

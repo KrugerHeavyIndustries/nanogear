@@ -24,8 +24,6 @@
 
 #include "nmethod.h"
 
-#include <algorithm>
-
 // Inizialize constants
 const NMethod NMethod::CONNECT("CONNECT", "Used with a proxy that can dynamically switch to being "
         "a tunnel");

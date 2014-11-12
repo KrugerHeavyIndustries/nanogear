@@ -114,14 +114,14 @@ public:
     /*!
      * \return The path requested by the client
      */
-    const QString& resourceRef() const
+    const std::string& resourceRef() const
     { return m_resourceRef; }
 
     /*!
      * Set the path requested by the client
      * \param path A string representing the requested path
      */
-    void setResourceRef(const QString& path)
+    void setResourceRef(const std::string& path)
     { m_resourceRef = path; }
 
     /*!
@@ -139,7 +139,7 @@ public:
 private:
     NMethod m_method;
     NClientInfo m_clientInfo;
-    QString m_resourceRef;
+    std::string m_resourceRef;
     std::unordered_map<std::string, std::string> m_parameters;
     NRepresentation* m_representation;
 };
