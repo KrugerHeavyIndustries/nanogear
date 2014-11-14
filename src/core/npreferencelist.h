@@ -24,8 +24,8 @@
 #ifndef NPREFERENCELIST_H
 #define NPREFERENCELIST_H
 
-#include <QMap>
-#include <QList>
+#include <map>
+#include <list>
 
 #include "npreference.h"
 
@@ -36,7 +36,7 @@
  * Preference's are meant to be chosen from. PreferenceList provides convenience methods for doing just that.
  */
 
-template <typename T> class NPreferenceList : public QList< NPreference<T> >
+template <typename T> class NPreferenceList : public std::list< NPreference<T> >
 {
 public:
     /*!
@@ -45,8 +45,8 @@ public:
     NPreferenceList() {}
 
 
-    NPreferenceList(const QList< NPreference<T> >& other)
-            : QList< NPreference<T> >(other) {}
+    NPreferenceList(const std::list< NPreference<T> >& other)
+            : std::list< NPreference<T> >(other) {}
 
     /*!
      * \return the Preference with the highest quality. The Preference the client wants most.
@@ -59,14 +59,14 @@ public:
      * \param server the list of possible choices.
      * \return the "best" choice, or a default-constructed one if no choice at all is available.
      */
-    T outOf(const QList<T>& server) const {
-        QMap<float, T> map = toMap();
+    T outOf(const std::list<T>& server) const {
+       std::map<float, T> map = toMap();
 
-        for (typename QMap<float, T>::iterator i = map.end(); i != map.begin();) {
+       for (typename std::map<float, T>::iterator i = map.end(); i != map.begin();) {
             --i;
 
-            if (server.contains(*i))
-                return *i;
+          if (std::find(server.begin(), server.end(), i->second) != server.end())
+             return i->second;
         }
 
         return T();
@@ -76,11 +76,21 @@ public:
      * Convert this PreferenceList to a map from quality to data.
      * \return a map from Preference quality to Preference data.
      */
-    QMap<float, T> toMap() const {
-        QMap<float, T> ret;
-        foreach(const NPreference<T>& type, *this) {
-            ret.insertMulti(type.quality(), type.data());
-        }
+    std::map<float, T> toMap() const {
+       std::map<float, T> ret;
+       for (typename NPreferenceList<T>::const_iterator i = NPreferenceList<T>::begin();
+            i != NPreferenceList<T>::end(); ++i)
+       {
+          ret.insert(std::make_pair<float, T>(i->quality(), i->data()));
+       }
+          
+       //for (template <> NPreferenceList<T>::const_iter i = this->begin(); i != this->end(); ++i) {
+          //ret.insert(std::make_pair<float, T>(i->quality(), i->data()));
+        //}
+        //std::transform(begin(), end(), std::back_inserter(ret.first()), _UnaryOperation __op)
+        //foreach(const NPreference<T>& type, *this) {
+         //   ret.insertMulti(type.quality(), type.data());
+        //}
 
         return ret;
     }

@@ -87,16 +87,16 @@ void NHTTPServer::onClientReadyRead()
     else if (requestedMethod.hasBody())
         entityBody = m_clientSocket->readAll();
 
-    NRepresentation entity(entityBody, requestHeader.value("Content-Type").toStdString());
+    NRepresentation entity(std::vector<unsigned char>(entityBody.begin(), entityBody.end()), requestHeader.value("Content-Type").toStdString());
 
     NPreferenceList<NMimeType> acceptedMimeTypes(
-        getPreferenceListFromHeader<NMimeType>(requestHeader.value("Accept")));
+        getPreferenceListFromHeader<NMimeType>(requestHeader.value("Accept").toStdString()));
 
     NPreferenceList<QLocale> acceptedLocales(
-        getPreferenceListFromHeader<QLocale>(requestHeader.value("Accept-Language")));
+        getPreferenceListFromHeader<QLocale>(requestHeader.value("Accept-Language").toStdString()));
 
     NPreferenceList<QTextCodec*> acceptedCharsets(
-        getPreferenceListFromHeader<QTextCodec*>(requestHeader.value("Accept-Charset")));
+        getPreferenceListFromHeader<QTextCodec*>(requestHeader.value("Accept-Charset").toStdString()));
 
 
     // Fill the ClientInfo object
@@ -121,7 +121,12 @@ void NHTTPServer::onClientReadyRead()
     // Handle POST query string
     if (entity.hasFormat("application/x-www-form-urlencoded")) {
         //             ↓ workaround to get QUrl recognize a query string
-        QUrl formData("?" + entity.data("application/x-www-form-urlencoded"));
+       
+        std::vector<unsigned char> urlencoded = entity.data("application/x-www-form-urlencoded");
+       
+       
+       
+       QUrl formData(QString::fromStdString("?" + std::string(urlencoded.begin(), urlencoded.end())));
         foreach(const KeyValuePair& keyValue, formData.encodedQueryItems()) {
            parameters[std::string(keyValue.first.data())] = std::string(keyValue.second.data());
         }
@@ -181,13 +186,15 @@ void NHTTPServer::onClientReadyRead()
     QByteArray responseData;
 
     if (representation != 0) { // the resource may or may not return a representation
-        if (representation->formats().count() == 1) {
-            responseHeader.setContentType(representation->formats().at(0));
-            responseData = representation->data(representation->formats().at(0).toStdString());
+        if (representation->formats().size() == 1) {
+            responseHeader.setContentType(QString::fromStdString(representation->formats().at(0).toString()));
+            std::vector<unsigned char> data = representation->data(representation->formats().at(0).toString());
+            responseData = QByteArray(reinterpret_cast<const char*>(data.data()), data.size());
         } else {
-			responseHeader.setContentType(QString::fromStdString(representation->format(clientInfo.acceptedMimeTypes())
+			   responseHeader.setContentType(QString::fromStdString(representation->format(clientInfo.acceptedMimeTypes())
                                           .toString()));
-            responseData = representation->data(clientInfo.acceptedMimeTypes());
+            std::vector<unsigned char> data = representation->data(clientInfo.acceptedMimeTypes());
+            responseData = QByteArray(reinterpret_cast<const char*>(data.data()), data.size());
         }
     }
 

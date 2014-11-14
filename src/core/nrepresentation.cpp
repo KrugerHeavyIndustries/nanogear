@@ -23,17 +23,50 @@
 
 #include "nrepresentation.h"
 
-#include <QString>
-#include <QRegExp>
-#include <QStringList>
+#include <iconv.h>
+#include <iterator>
 
-void NRepresentation::setXhtml(const QString& xhtml)
+#define OUTBUFLEN 4096
+
+namespace
 {
-    setData("application/xhtml+xml", xhtml.toUtf8());
+   
+   std::string kf(const std::pair<std::string, std::vector<unsigned char> >& pair)
+   {
+      return pair.first;
+   }
+   
+   struct KeyFunc
+   {
+      std::string operator() (const std::pair<std::string, std::vector<unsigned char> >& pair)
+      {
+         return pair.first;
+      }
+   };
+}
 
-    QString html = xhtml;
-    QRegExp fix;
+void NRepresentation::setXhtml(const std::string& xhtml)
+{
+    char outbuf[OUTBUFLEN];
+   
+    size_t inbytesleft = xhtml.size();
+    size_t outbytesleft = 0;
+   
+    char* inptr = const_cast<char*>(xhtml.c_str());
+    char* outptr = outbuf;
+   
+    iconv_t cd = iconv_open("UTF-8", "ASCII");
+   
+    iconv(cd, &inptr, &inbytesleft, &outptr, &outbytesleft);
+          
+    setData("application/xhtml+xml", std::vector<unsigned char>(outbuf, outbuf + outbytesleft));
+   
+    iconv_close(cd);
 
+    std::string html = xhtml;
+    //QRegExp fix;
+
+/*
     // Convert XHTML to valid HTML.
 #define ELEMENT_NONEMPTY(x) \
     fix = QRegExp("<"x" (.*)/>"); \
@@ -137,16 +170,21 @@ void NRepresentation::setXhtml(const QString& xhtml)
     ELEMENT_EMPTY("meta");
     ELEMENT_EMPTY("param");
 #undef ELEMENT_EMPTY
+ */
 
     setHtml(html);
 }
 
-QList<NMimeType> NRepresentation::mimeTypeFormats() const
+void NRepresentation::setHtml(const std::string& html)
 {
-    QList<NMimeType> types;
-	foreach(const QString& type, QMimeData::formats())
-	types.append(type.toStdString());
-    return types;
+   setData("text/html", std::vector<unsigned char>(html.begin(), html.begin()));
+}
+
+std::list<NMimeType> NRepresentation::mimeTypeFormats() const
+{
+   std::list<NMimeType> types;
+   std::transform(m_data.begin(), m_data.end(), std::back_inserter(types), kf);
+   return types;
 }
 
 

@@ -24,8 +24,8 @@
 #ifndef NREPRESENTATION_H
 #define NREPRESENTATION_H
 
-#include <QMimeData>
-#include <QByteArray>
+#include <unordered_map>
+#include <vector>
 
 #include "nmimetype.h"
 #include "npreferencelist.h"
@@ -41,18 +41,21 @@
  *      http://roy.gbiv.com/pubs/dissertation/rest_arch_style.htm#sec_5_2_1_2
  */
 
-class NRepresentation : public QMimeData
+class NRepresentation
 {
 public:
     NRepresentation() {}
 
-    NRepresentation(const QByteArray& data, const NMimeType& mimeType = NMimeType("text/plain"))
+    NRepresentation(const std::string& data, const NMimeType& mimeType = NMimeType("text/plain"))
+    { setData(mimeType, std::vector<unsigned char>(data.begin(), data.end())); }
+   
+    NRepresentation(const std::vector<unsigned char>& data, const NMimeType& mimeType = NMimeType("text/plain"))
     { setData(mimeType, data); }
 
     /*!
      * \return the data (in raw form) attached to this representation
      */
-    QByteArray data(const NPreferenceList<NMimeType>& mimeTypes) const
+    std::vector<unsigned char> data(const NPreferenceList<NMimeType>& mimeTypes) const
     { return data(format(mimeTypes)); }
 
     /*!
@@ -61,32 +64,35 @@ public:
      */
     NMimeType format(const NPreferenceList<NMimeType>& mimeTypes) const
     { return mimeTypes.outOf(mimeTypeFormats()); }
-
+   
+    std::vector<NMimeType> formats() const
+    {  return std::vector<NMimeType>(); }
+ 
     /*!
      * \return the data (in raw form) attached to this representation
      */
-    QByteArray data(const NMimeType& mimeType) const
-	{ return QMimeData::data(QString::fromStdString(mimeType.toString())); }
+   std::vector<unsigned char> data(const NMimeType& mimeType) const
+	{ return m_data.at(mimeType.toString()); }
 
     /*!
      * An overloaded function provided for convenience
      * \param mimeType A reference to a MimeType
      * \param data A reference to the raw data
      */
-    void setData(const NMimeType& mimeType, const QByteArray& data)
-    { QMimeData::setData(QString::fromStdString(mimeType.toString()), data); }
+    void setData(const NMimeType& mimeType, const std::vector<unsigned char>& data)
+    { m_data.insert(std::pair<std::string, std::vector<unsigned char> >(mimeType.toString(), data)); }
 
     /*!
      * \return true if the requested format is available
      */
     bool hasFormat(const NMimeType& mimeType) const
-    { return QMimeData::hasFormat(QString::fromStdString(mimeType.toString())); }
-
+    { return m_data.find(mimeType.toString()) != m_data.end(); }
+   
     /*!
      * A facility to easily add Xhtml content to this representation
      * \param xhtml A string representing the XHTML document
      */
-    void setXhtml(const QString& xhtml);
+    void setXhtml(const std::string& xhtml);
 
     /*!
      * \return true if this representation is holding an XHTML document
@@ -97,14 +103,29 @@ public:
     /*!
      * \return the XHTML document attached to this representation
      */
-    QString xhtml() const
-    { return data("application/xhtml+xml"); }
+    std::string xhtml() const
+    {
+       const std::vector<unsigned char>& d = data("application/xhtml+xml");
+       return std::string(d.begin(), d.end());
+    }
 
+    void setHtml(const std::string& html);
+   
+    std::string html() const
+    {
+       const std::vector<unsigned char>& d = data("application/html");
+       return std::string(d.begin(), d.end());
+    }
+   
     /*!
      * \return the list of formats this representation can give back to the
      *    clients as MIME types.
      */
-    QList<NMimeType> mimeTypeFormats() const;
+    std::list<NMimeType> mimeTypeFormats() const;
+   
+private:
+   
+   std::unordered_map<std::string, std::vector<unsigned char> > m_data;
 };
 
 #endif /* NREPRESENTATION_H */

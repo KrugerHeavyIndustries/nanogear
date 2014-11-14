@@ -8,6 +8,7 @@ message(STATUS "This is Nanogear ${NANOGEAR_MAJOR}.${NANOGEAR_MINOR}.${NANOGEAR_
 option(WITH_EXAMPLES "WITH_EXAMPLES" OFF)
 
 find_package(Libmagic REQUIRED)
+find_package(Iconv REQUIRED)
 
 find_package(Qt4 REQUIRED)
 set(QT_USE_QTNETWORK 1)

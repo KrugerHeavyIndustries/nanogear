@@ -120,9 +120,9 @@ private:
 
     QDir m_root;
     bool m_indexAllowed;
-	std::string m_indexName;
+	 std::string m_indexName;
     std::string m_xhtmlRepr;
-	std::unordered_map<std::string, std::string> m_mimeMappings;
+	 std::unordered_map<std::string, std::string> m_mimeMappings;
 
     NRepresentation m_notAllowed;
     NRepresentation m_directoryIndex;

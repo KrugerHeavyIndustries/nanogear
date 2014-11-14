@@ -66,6 +66,16 @@ public:
         
         return router;
     }
+   
+    virtual bool notify(QObject* o, QEvent* e)
+    {
+       try {
+          return QCoreApplication::notify(o, e);
+       }
+       catch (std::exception& what) {
+          return true;
+       }
+    }
 };
 
 int main(int argc, char** argv) {

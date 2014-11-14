@@ -35,10 +35,10 @@
 
 NDirectoryResource::NDirectoryResource(const std::string& root) : m_root(QString::fromStdString(root)), m_indexAllowed(true)
 {
-    m_notAllowed.setData("<html><head><title>403 Forbidden</title></head><body>"
+    m_notAllowed.setHtml("<html><head><title>403 Forbidden</title></head><body>"
                          "<h1>Forbidden</h1>"
                          "<p>Unable to display this resource</p>"
-                         "</body>", "text/html");
+                         "</body>");
 
     m_xhtmlRepr = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
                   "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
@@ -89,7 +89,7 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
             } else if (m_indexAllowed) {
                 // Return an HTML representation of this directory
 
-				std::ostringstream htmlTableEntries;
+				    std::ostringstream htmlTableEntries;
                 foreach(const QFileInfo& dirFileInfo, QDir(pathInfo.absoluteFilePath()).entryInfoList()) {
                     std::string fileType("File");
                     std::string dirIdentifier("");
@@ -113,8 +113,8 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
 										"</tr>\n";
 
                 }
-
-				m_directoryIndex.setXhtml(QString::fromStdString(m_xhtmlRepr).arg(pathInfo.fileName()).arg(QString::fromStdString(htmlTableEntries.str())));
+               
+                m_directoryIndex.setXhtml(QString::fromStdString(m_xhtmlRepr).arg(pathInfo.fileName()).arg(QString::fromStdString(htmlTableEntries.str())).toStdString());
 
                 response.setStatus(NStatus::SUCCESS_OK);
                 response.setRepresentation(&m_directoryIndex);
@@ -137,7 +137,7 @@ void NDirectoryResource::representFile(const QFileInfo& pathInfo, NResponse& res
     //! \todo: Create a thin layer over libmagic?
     magic_t magicCookie = magic_open(MAGIC_MIME_TYPE | MAGIC_SYMLINK | MAGIC_ERROR);
     magic_load(magicCookie, NULL);
-	std::string mimeType(magic_file(magicCookie, pathInfo.absoluteFilePath().toStdString().c_str()));
+	 std::string mimeType(magic_file(magicCookie, pathInfo.absoluteFilePath().toStdString().c_str()));
     magic_close(magicCookie);
 
     // If libmagic faild to find the MIME type, we query for custom-mapped extensions
@@ -156,7 +156,8 @@ void NDirectoryResource::representFile(const QFileInfo& pathInfo, NResponse& res
     QFile file(pathInfo.absoluteFilePath());
 
     file.open(QIODevice::ReadOnly);
-    m_rawFile.setData(mimeType.c_str(), file.readAll());
+    QByteArray array = file.readAll();
+    m_rawFile.setData(mimeType.c_str(), std::vector<unsigned char>(array.begin(), array.end()));
     file.close();
 
     response.setStatus(NStatus::SUCCESS_OK);
