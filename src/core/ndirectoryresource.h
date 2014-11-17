@@ -59,7 +59,7 @@ public:
      * \param root An absolute or relative path to a directory on the filesystem
      */
     void setRoot(const std::string& root)
-	{ m_root = QDir(QString::fromStdString(root)); }
+    { m_root = QDir(QString::fromStdString(root)); }
 
     /*!
      * \return The absolute path to the root directory

@@ -63,10 +63,13 @@ public:
      *    the client
      */
     NMimeType format(const NPreferenceList<NMimeType>& mimeTypes) const
-    { return mimeTypes.outOf(mimeTypeFormats()); }
+    { return mimeTypes.outOf(formats()); }
    
-    std::vector<NMimeType> formats() const
-    {  return std::vector<NMimeType>(); }
+   /*!
+    * \return the list of formats this representation can give back to the
+    *    clients as MIME types.
+    */
+    std::vector<NMimeType> formats() const;
  
     /*!
      * \return the data (in raw form) attached to this representation
@@ -117,13 +120,7 @@ public:
        return std::string(d.begin(), d.end());
     }
    
-    /*!
-     * \return the list of formats this representation can give back to the
-     *    clients as MIME types.
-     */
-    std::list<NMimeType> mimeTypeFormats() const;
-   
-private:
+  private:
    
    std::unordered_map<std::string, std::vector<unsigned char> > m_data;
 };

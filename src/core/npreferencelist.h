@@ -25,7 +25,7 @@
 #define NPREFERENCELIST_H
 
 #include <map>
-#include <list>
+#include <vector>
 
 #include "npreference.h"
 
@@ -36,7 +36,7 @@
  * Preference's are meant to be chosen from. PreferenceList provides convenience methods for doing just that.
  */
 
-template <typename T> class NPreferenceList : public std::list< NPreference<T> >
+template <typename T> class NPreferenceList : public std::vector< NPreference<T> >
 {
 public:
     /*!
@@ -45,8 +45,8 @@ public:
     NPreferenceList() {}
 
 
-    NPreferenceList(const std::list< NPreference<T> >& other)
-            : std::list< NPreference<T> >(other) {}
+    NPreferenceList(const std::vector< NPreference<T> >& other)
+            :  std::vector< NPreference<T> >(other) {}
 
     /*!
      * \return the Preference with the highest quality. The Preference the client wants most.
@@ -59,7 +59,7 @@ public:
      * \param server the list of possible choices.
      * \return the "best" choice, or a default-constructed one if no choice at all is available.
      */
-    T outOf(const std::list<T>& server) const {
+    T outOf(const std::vector<T>& server) const {
        std::map<float, T> map = toMap();
 
        for (typename std::map<float, T>::iterator i = map.end(); i != map.begin();) {

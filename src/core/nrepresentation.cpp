@@ -30,19 +30,10 @@
 
 namespace
 {
-   
-   std::string kf(const std::pair<std::string, std::vector<unsigned char> >& pair)
+   std::string key_retrieval_func(const std::pair<std::string, std::vector<unsigned char> >& pair)
    {
       return pair.first;
    }
-   
-   struct KeyFunc
-   {
-      std::string operator() (const std::pair<std::string, std::vector<unsigned char> >& pair)
-      {
-         return pair.first;
-      }
-   };
 }
 
 void NRepresentation::setXhtml(const std::string& xhtml)
@@ -50,16 +41,17 @@ void NRepresentation::setXhtml(const std::string& xhtml)
     char outbuf[OUTBUFLEN];
    
     size_t inbytesleft = xhtml.size();
-    size_t outbytesleft = 0;
+    size_t outbytesleft = OUTBUFLEN;
    
     char* inptr = const_cast<char*>(xhtml.c_str());
     char* outptr = outbuf;
    
     iconv_t cd = iconv_open("UTF-8", "ASCII");
    
-    iconv(cd, &inptr, &inbytesleft, &outptr, &outbytesleft);
+    if (iconv(cd, &inptr, &inbytesleft, &outptr, &outbytesleft) == -1)
+       throw std::logic_error("failed to convert using iconv");
           
-    setData("application/xhtml+xml", std::vector<unsigned char>(outbuf, outbuf + outbytesleft));
+    setData("application/xhtml+xml", std::vector<unsigned char>(outbuf, outbuf + (OUTBUFLEN - outbytesleft)));
    
     iconv_close(cd);
 
@@ -177,13 +169,13 @@ void NRepresentation::setXhtml(const std::string& xhtml)
 
 void NRepresentation::setHtml(const std::string& html)
 {
-   setData("text/html", std::vector<unsigned char>(html.begin(), html.begin()));
+   setData("text/html", std::vector<unsigned char>(html.begin(), html.end()));
 }
 
-std::list<NMimeType> NRepresentation::mimeTypeFormats() const
+std::vector<NMimeType> NRepresentation::formats() const
 {
-   std::list<NMimeType> types;
-   std::transform(m_data.begin(), m_data.end(), std::back_inserter(types), kf);
+   std::vector<NMimeType> types;
+   std::transform(m_data.begin(), m_data.end(), std::back_inserter(types), key_retrieval_func);
    return types;
 }
 

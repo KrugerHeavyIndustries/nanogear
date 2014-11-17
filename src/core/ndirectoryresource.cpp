@@ -33,7 +33,9 @@
 #include "nrequest.h"
 #include "nresponse.h"
 
-NDirectoryResource::NDirectoryResource(const std::string& root) : m_root(QString::fromStdString(root)), m_indexAllowed(true)
+NDirectoryResource::NDirectoryResource(const std::string& root)
+:  m_root(QString::fromStdString(root)),
+   m_indexAllowed(true)
 {
     m_notAllowed.setHtml("<html><head><title>403 Forbidden</title></head><body>"
                          "<h1>Forbidden</h1>"
@@ -71,10 +73,9 @@ NDirectoryResource::NDirectoryResource(const std::string& root) : m_root(QString
                   "</table>"
                   "</div>"
                   "<div class=\"foot\">Nanogear</div>"
-                  "</body>"
+                  "</body>" 
                   "</html>";
 }
-
 
 void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
 {
