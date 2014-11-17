@@ -72,7 +72,7 @@ public:
 "</body>\n"
 "</html>\n";
 
-        m_representation.setHtml(QString::fromStdString(html.str()));
+        m_representation.setHtml(html.str());
        
         response.setStatus(NStatus::SUCCESS_OK);
         response.setRepresentation(&m_representation);
