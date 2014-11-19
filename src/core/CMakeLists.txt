@@ -7,6 +7,7 @@ set(nanogear_SRCS
     nrouter.cpp
     nstatus.cpp
     nmimetype.cpp
+		napplication.cpp
 )
 
 add_library(Nanogear SHARED ${nanogear_SRCS})

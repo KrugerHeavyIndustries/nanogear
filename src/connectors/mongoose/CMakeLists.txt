@@ -1,4 +1,9 @@
-set(mongoose_SRCS mongoose.c)
+set(mongoose_SRCS 
+	mongoose.c
+	mongoose_cpp.cpp
+	httprequestheader.cpp
+	httpresponseheader.cpp
+)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/core)
 

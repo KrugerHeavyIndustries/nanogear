@@ -65,7 +65,7 @@ namespace nanogear
          case MG_AUTH:
             return MG_TRUE;
          case MG_REQUEST:
-            return handleRequest((Connection*)connection);
+            return handleRequest(reinterpret_cast<Connection*>(connection));
          default: return MG_FALSE;
       }
    }
@@ -118,6 +118,8 @@ namespace nanogear
       
       if (representation != NULL) {
          if (representation->formats().size() == 1) {
+            responseHeader.setContentType(representation->formats().front());
+            responseData = representation->data(representation->formats().front());
          } else {
             responseHeader.setContentType(representation->format(clientInfo.acceptedMimeTypes()));
             responseData = representation->data(clientInfo.acceptedMimeTypes());
