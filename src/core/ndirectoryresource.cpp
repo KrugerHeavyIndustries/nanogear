@@ -32,6 +32,9 @@
 
 #include "nrequest.h"
 #include "nresponse.h"
+#include "bytearray.h"
+
+using nanogear::ByteArray;
 
 NDirectoryResource::NDirectoryResource(const std::string& root)
 :  m_root(QString::fromStdString(root)),
@@ -158,7 +161,7 @@ void NDirectoryResource::representFile(const QFileInfo& pathInfo, NResponse& res
 
     file.open(QIODevice::ReadOnly);
     QByteArray array = file.readAll();
-    m_rawFile.setData(mimeType.c_str(), std::vector<unsigned char>(array.begin(), array.end()));
+    m_rawFile.setData(mimeType.c_str(), ByteArray(array.begin(), array.end()));
     file.close();
 
     response.setStatus(NStatus::SUCCESS_OK);

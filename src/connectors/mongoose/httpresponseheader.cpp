@@ -11,7 +11,7 @@
 
 namespace nanogear
 {
-   using namespace std;
+   using std::string;
    
    HttpResponseHeader::HttpResponseHeader(int status, const string& text, int majorVersion, int minorVersion) :
       m_status(status),

@@ -9,10 +9,10 @@
 #include "httprequestheader.h"
 #include <string>
 
-using namespace std;
-
 namespace nanogear
 {
+   using std::string;
+   
    HttpRequestHeader::HttpRequestHeader(int majorVersion, int minorVersion)
    : map<string, string>(),
       m_majorVersion(majorVersion),

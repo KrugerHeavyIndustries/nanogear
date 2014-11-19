@@ -14,7 +14,7 @@
 #include <nrepresentation.h>
 #include <nclientinfo.h>
 #include <napplication.h>
-
+#include <bytearray.h>
 
 #include <algorithm>
 #include <iterator>
@@ -114,7 +114,7 @@ namespace nanogear
          //responseHeader.insert(make_pair("Expires", responseHeader.getExpirationDate().toUTC());
       }
       
-      vector<unsigned char> responseData;
+      ByteArray responseData;
       
       if (representation != NULL) {
          if (representation->formats().size() == 1) {
@@ -161,21 +161,19 @@ namespace nanogear
       const char* key_start = first;
       const char* key_end = NULL;
       const char* value_start = NULL;
-      const char* value_end = NULL;
       
       for (; first != last; ++first) {
          if (*first == '&') {
+            parameters.insert(make_pair(string(key_start, key_end), string(value_start, first)));
             key_start = first + 1;
-            value_end = first;
-            parameters.insert(make_pair(string(key_start, key_end), string(value_start, value_end)));
          }
          if (*first == '=') {
             key_end = first;
             value_start = first + 1;
          }
       }
-      if (key_start && key_end && value_start && value_end) {
-         parameters.insert(make_pair(string(key_start, key_end), string(value_start, value_end)));
+      if (key_start && key_end && value_start && first) {
+         parameters.insert(make_pair(string(key_start, key_end), string(value_start, first)));
       }
    
       return parameters;
@@ -234,7 +232,7 @@ namespace nanogear
       }
    }
    
-   void Connection::sendData(const std::vector<unsigned char>& data)
+   void Connection::sendData(const ByteArray& data)
    {
       mg_send_data(unwrap(), data.data(), data.size());
    }
