@@ -25,7 +25,9 @@
 #include <NDirectoryResource>
 #include <NStatus>
 
-#include <ihttp/NHTTPServer>
+#include <mongoose/mongoose_cpp.h>
+
+using namespace nanogear;
 
 class DirectoryApplication : public NApplication {
 public:
@@ -40,7 +42,7 @@ public:
 
 int main(int argc, char** argv) {
     DirectoryApplication app(argc, argv);
-    app.setServer(new NHTTPServer());
+    app.setServer(HTTPServer_Create());
     return app.exec();
 }
 

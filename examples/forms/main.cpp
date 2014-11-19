@@ -24,10 +24,12 @@
 #include <NRequest>
 #include <NResource>
 #include <NRepresentation>
-#include <ihttp/NHTTPServer>
+#include <mongoose/mongoose_cpp.h>
 
 #include <iostream>
 #include <sstream>
+
+using namespace nanogear;
 
 namespace std {
    ostream& operator <<(ostream& os, const pair<string, string>& p) {
@@ -97,7 +99,7 @@ public:
 
 int main(int argc, char** argv) {
     FormsApplication app(argc, argv);
-    app.setServer(new NHTTPServer());
+    app.setServer(HTTPServer_Create());
     return app.exec();
 }
 

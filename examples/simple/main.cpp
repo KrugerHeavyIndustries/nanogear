@@ -23,7 +23,9 @@
 #include <NRepresentation>
 #include <NStatus>
 #include <NRouter>
-#include <ihttp/NHTTPServer>
+#include <mongoose/mongoose_cpp.h>
+
+using namespace nanogear;
 
 class RootResource : public NResource {
 public:
@@ -66,21 +68,11 @@ public:
         
         return router;
     }
-   
-    virtual bool notify(QObject* o, QEvent* e)
-    {
-       try {
-          return QCoreApplication::notify(o, e);
-       }
-       catch (std::exception& what) {
-          return true;
-       }
-    }
 };
 
 int main(int argc, char** argv) {
     SimpleApplication app(argc, argv);
-    app.setServer(new NHTTPServer());
+    app.setServer(HTTPServer_Create());
     return app.exec();
 }
 

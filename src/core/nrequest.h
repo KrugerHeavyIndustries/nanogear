@@ -24,9 +24,6 @@
 #ifndef NREQUEST_H
 #define NREQUEST_H
 
-#include <QObject>
-#include <QByteArray>
-
 #include <unordered_map>
 
 #include "nmethod.h"
@@ -54,7 +51,7 @@ class NRepresentation;
  * The request body is represented by a read-only QByteArray
  */
 
-class NRequest : public QObject
+class NRequest
 {
 public:
     /*!
