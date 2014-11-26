@@ -18,6 +18,5 @@ namespace nanogear
       m_majorVersion(majorVersion),
       m_minorVersion(minorVersion)
    {
-      
    }
 }

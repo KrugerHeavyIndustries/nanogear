@@ -22,7 +22,7 @@
  */
 
 #ifndef NMETADATA_H
-#define	NMETADATA_H
+#define NMETADATA_H
 
 #include <string>
 

@@ -57,7 +57,7 @@ namespace nanogear
       
          void sendStatus(int status);
       
-         void sendHeader(const std::string& name, const std::string& value);
+         void sendHeader(const std::string& name, const std::string& value) const;
       
          void sendHttpResponseHeader(const HttpResponseHeader& responseHeader);
 

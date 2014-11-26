@@ -24,26 +24,37 @@ using namespace std;
 
 namespace nanogear
 {
-   #define MAX_PORT_SIZE 16
+   #define MAX_PORT_SIZE 8
    #define SERVER_POLL_MILLISECONDS 1000
    #define unwrap() connection_cast(this)
    
-   inline mg_connection* connection_cast(Connection* connection)
+   inline mg_connection* connection_cast(const Connection* connection)
    {
-      return reinterpret_cast<mg_connection*>(connection);
+      return (mg_connection*)(connection);
    }
    
-   inline const mg_connection* connection_cast(const Connection* connection)
-   {
-      return reinterpret_cast<const mg_connection*>(connection);
-   }
-   
-   HttpRequestHeader::value_type request_header_map(mg_connection::mg_header header)
+   inline HttpRequestHeader::value_type request_header_map(const mg_connection::mg_header& header)
    {
       return HttpRequestHeader::value_type(header.name, header.value);
    }
    
-   HTTPServer::HTTPServer(int port) : NServer(port)
+   struct send_header_t
+   {
+      send_header_t(const Connection* connection)
+         :  m_connection(connection)
+      {
+      }
+      
+      void operator()(const HttpResponseHeader::value_type& tuple)
+      {
+         m_connection->sendHeader(tuple.first, tuple.second);
+      }
+      
+      const Connection* m_connection;
+   };
+   
+   HTTPServer::HTTPServer(int port)
+      :  NServer(port)
    {
    }
    
@@ -136,18 +147,12 @@ namespace nanogear
    
    string Connection::getUri() const
    {
-      return string(unwrap()->uri);
+      return unwrap()->uri;
    }
    
    NMethod Connection::getMethod() const
    {
-      string request_method;
-      size_t request_method_len = strlen(unwrap()->request_method);
-      transform(unwrap()->request_method,
-                unwrap()->request_method + request_method_len,
-                back_inserter(request_method),
-                toupper);
-      return NMethod::valueOf(request_method);
+      return NMethod::valueOf(unwrap()->request_method);
    }
    
    unordered_map<string, string> Connection::getQueryParameters() const
@@ -172,7 +177,7 @@ namespace nanogear
             value_start = first + 1;
          }
       }
-      if (key_start && key_end && value_start && first) {
+      if (first && key_start && key_end && value_start) {
          parameters.insert(make_pair(string(key_start, key_end), string(value_start, first)));
       }
    
@@ -217,7 +222,7 @@ namespace nanogear
       mg_send_status(unwrap(), status);
    }
    
-   void Connection::sendHeader(const std::string& name, const std::string& value)
+   void Connection::sendHeader(const std::string& name, const std::string& value) const
    {
       mg_send_header(unwrap(), name.c_str(), value.c_str());
    }
@@ -225,11 +230,7 @@ namespace nanogear
    void Connection::sendHttpResponseHeader(const HttpResponseHeader& header)
    {
       sendStatus(header.getStatus());
-      HttpResponseHeader::const_iterator iter;
-      for (iter = header.begin(); iter != header.end(); ++iter)
-      {
-         sendHeader(iter->first, iter->second);
-      }
+      for_each(header.begin(), header.end(), send_header_t(this));
    }
    
    void Connection::sendData(const ByteArray& data)

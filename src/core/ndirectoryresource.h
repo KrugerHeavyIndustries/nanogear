@@ -24,17 +24,18 @@
 #ifndef NDIRECTORYRESOURCE_H
 #define NDIRECTORYRESOURCE_H
 
-#include <QDir>
-#include <QString>
-
 #include <unordered_map>
 
 #include "nresource.h"
 #include "nrepresentation.h"
 
 class NRequest;
-
 class NResponse;
+
+namespace nanogear
+{
+class File;
+}
 
 /*!
  * \class NDirectoryResource
@@ -59,13 +60,13 @@ public:
      * \param root An absolute or relative path to a directory on the filesystem
      */
     void setRoot(const std::string& root)
-    { m_root = QDir(QString::fromStdString(root)); }
+    { m_root = root; }
 
     /*!
      * \return The absolute path to the root directory
      */
     std::string root() const
-    { return m_root.absolutePath().toStdString(); }
+    { return m_root; }
 
     /*!
      * Set the index file name
@@ -116,12 +117,13 @@ private:
      * \param pathInfo A QFileInfo reference of the requested file
      * \param response A reference to the NResponse object passed to handleGet
      */
-    void representFile(const QFileInfo& pathInfo, NResponse& response);
+    void representFile(const nanogear::File& pathInfo, NResponse& response);
+   
+    std::string xhtmlRepresentation(const std::string& title, const std::string& tableBody);
 
-    QDir m_root;
+    std::string m_root;
     bool m_indexAllowed;
 	 std::string m_indexName;
-    std::string m_xhtmlRepr;
 	 std::unordered_map<std::string, std::string> m_mimeMappings;
 
     NRepresentation m_notAllowed;
