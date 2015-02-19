@@ -95,7 +95,6 @@ namespace nanogear {
    // inlines
    //
    
-   
    inline StringTokenizer::Iterator StringTokenizer::begin() const
    {
       return _tokens.begin();
@@ -106,15 +105,13 @@ namespace nanogear {
    {
       return _tokens.end();
    }
-   
-   
+
    inline std::string& StringTokenizer::operator [] (std::size_t index)
    {
       //if (index >= _tokens.size()) throw RangeException();
       return _tokens[index];
    }
-   
-   
+
    inline const std::string& StringTokenizer::operator [] (std::size_t index) const
    {
       //if (index >= _tokens.size()) throw RangeException();

@@ -35,8 +35,8 @@
 #endif
 
 
-namespace nanogear {
-
+namespace nanogear
+{
 
 File::File()
 {

@@ -21,7 +21,6 @@
 
 #include "timestamp.h"
 
-
 namespace nanogear
 {
    
@@ -292,7 +291,7 @@ namespace nanogear
    }
    
    
-} // namespace Poco
+} // namespace nanogear
 
 
 #endif // Foundation_Timespan_INCLUDED
