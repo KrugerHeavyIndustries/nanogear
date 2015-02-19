@@ -16,20 +16,19 @@
 //
 
 
-#ifndef Foundation_DirectoryIterator_UNIX_INCLUDED
-#define Foundation_DirectoryIterator_UNIX_INCLUDED
+#ifndef NANOGEAR_PLATFORM_DIRECTORY_ITERATOR_H
+#define NANOGEAR_PLATFORM_DIRECTORY_ITERATOR_H
 
 #include <dirent.h>
 #include <string>
 
-namespace nanogear {
-   
-   
-   class DirectoryIteratorImpl
+namespace nanogear { namespace platform
+{
+   class DirectoryIterator
    {
    public:
-      DirectoryIteratorImpl(const std::string& path);
-      ~DirectoryIteratorImpl();
+      DirectoryIterator(const std::string& path);
+      ~DirectoryIterator();
       
       void duplicate();
       void release();
@@ -38,35 +37,32 @@ namespace nanogear {
       const std::string& next();
       
    private:
-      DIR*        _pDir;
-      std::string _current;
-      int _rc;
+      DIR*        m_dir;
+      std::string m_current;
+      int m_rc;
    };
-   
-   
+
    //
    // inlines
    //
-   const std::string& DirectoryIteratorImpl::get() const
+   const std::string& DirectoryIterator::get() const
    {
-      return _current;
+      return m_current;
+   }
+
+   inline void DirectoryIterator::duplicate()
+   {
+      ++m_rc;
    }
    
-   
-   inline void DirectoryIteratorImpl::duplicate()
+   inline void DirectoryIterator::release()
    {
-      ++_rc;
-   }
-   
-   
-   inline void DirectoryIteratorImpl::release()
-   {
-      if (--_rc == 0)
+      if (--m_rc == 0)
          delete this;
    }
    
-   
-} // namespace Poco
+} // namespace platform
+} // namespace nanogear
 
 
-#endif // Foundation_DirectoryIterator_UNIX_INCLUDED
+#endif // NANOGEAR_PLATFORM_DIRECTORY_ITERATOR_H

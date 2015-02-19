@@ -10,44 +10,44 @@
 
 #include <string>
 
-namespace nanogear
+namespace nanogear { namespace platform
 {
 
-class FileImpl
+class File
 {
 protected:
-	typedef uint64_t FileSizeImpl;
+	typedef uint64_t FileSize;
 
-	FileImpl();
-	FileImpl(const std::string& path);
-	virtual ~FileImpl();
-	void swapImpl(FileImpl& file);
-	void setPathImpl(const std::string& path);
-	const std::string& getPathImpl() const;
-	bool existsImpl() const;
-	bool canReadImpl() const;
-	bool canWriteImpl() const;
-	bool canExecuteImpl() const;
-	bool isFileImpl() const;
-	bool isDirectoryImpl() const;
-	bool isLinkImpl() const;
-	bool isDeviceImpl() const;
-	bool isHiddenImpl() const;
+	File();
+	File(const std::string& path);
+	virtual ~File();
+	void swap(File& file);
+	void setPath(const std::string& path);
+	const std::string& getPath() const;
+	bool exists() const;
+	bool canRead() const;
+	bool canWrite() const;
+	bool canExecute() const;
+	bool isFile() const;
+	bool isDirectory() const;
+	bool isLink() const;
+	bool isDevice() const;
+	bool isHidden() const;
    
-	Timestamp createdImpl() const;
-	Timestamp getLastModifiedImpl() const;
-	void setLastModifiedImpl(const Timestamp& ts);
+	Timestamp created() const;
+	Timestamp getLastModified() const;
+	void setLastModified(const Timestamp& ts);
 	
-   FileSizeImpl getSizeImpl() const;
-	void setSizeImpl(FileSizeImpl size);
-	void setWriteableImpl(bool flag = true);		
-	void setExecutableImpl(bool flag = true);		
-	void copyToImpl(const std::string& path) const;
-	void renameToImpl(const std::string& path);
-	void removeImpl();
-	bool createFileImpl();
-	bool createDirectoryImpl();
-	static void handleLastErrorImpl(const std::string& path);
+   FileSize getSize() const;
+	void setSize(FileSize size);
+	void setWriteable(bool flag = true);
+	void setExecutable(bool flag = true);
+	void copyTo(const std::string& path) const;
+	void renameTo(const std::string& path);
+	void remove();
+	bool createFile();
+	bool createDirectory();
+	static void handleLastError(const std::string& path);
 	
 private:
 	std::string _path;
@@ -61,13 +61,13 @@ private:
 //
 // inlines
 //
-inline const std::string& FileImpl::getPathImpl() const
+inline const std::string& File::getPath() const
 {
 	return _path;
 }
 
-
-} // namespace Poco
+} // namespace platform
+} // namespace nanogear
 
 
 #endif // Foundation_File_UNIX_INCLUDED

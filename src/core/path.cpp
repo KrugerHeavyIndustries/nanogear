@@ -10,7 +10,6 @@
 //#endif
 #include <algorithm>
 
-
 #if defined(POCO_OS_FAMILY_VMS)
 #include "Path_VMS.cpp"
 #elif defined(__APPLE__)
@@ -25,31 +24,26 @@
 #include "Path_WIN32.cpp"
 #endif
 
+namespace nanogear
+{
 
-namespace nanogear {
-
-
-Path::Path(): _absolute(false)
+Path::Path() : _absolute(false)
 {
 }
-
 
 Path::Path(bool absolute): _absolute(absolute)
 {
 }
-
 
 Path::Path(const std::string& path)
 {
 	assign(path);
 }
 
-
 Path::Path(const std::string& path, Style style)
 {
 	assign(path, style);
 }
-
 
 Path::Path(const char* path)
 {
@@ -57,13 +51,11 @@ Path::Path(const char* path)
 	assign(path);
 }
 
-
 Path::Path(const char* path, Style style)
 {
 	//poco_check_ptr(path);
 	assign(path, style);
 }
-
 
 Path::Path(const Path& path): 
 	_node(path._node), 
@@ -74,7 +66,6 @@ Path::Path(const Path& path):
 	_absolute(path._absolute)
 {	
 }
-
 
 Path::Path(const Path& parent, const std::string& fileName):
 	_node(parent._node), 
@@ -88,7 +79,6 @@ Path::Path(const Path& parent, const std::string& fileName):
 	_name = fileName;
 }
 
-
 Path::Path(const Path& parent, const char* fileName):
 	_node(parent._node), 
 	_device(parent._device),
@@ -101,7 +91,6 @@ Path::Path(const Path& parent, const char* fileName):
 	_name = fileName;
 }
 
-
 Path::Path(const Path& parent, const Path& relative):
 	_node(parent._node), 
 	_device(parent._device),
@@ -113,30 +102,25 @@ Path::Path(const Path& parent, const Path& relative):
 	resolve(relative);
 }
 
-
 Path::~Path()
 {
 }
-
 	
 Path& Path::operator = (const Path& path)
 {
 	return assign(path);
 }
 
-	
 Path& Path::operator = (const std::string& path)
 {
 	return assign(path);
 }
-
 
 Path& Path::operator = (const char* path)
 {
 	//poco_check_ptr(path);
 	return assign(path);
 }
-
 
 void Path::swap(Path& path)
 {
@@ -147,7 +131,6 @@ void Path::swap(Path& path)
 	std::swap(_dirs, path._dirs);
 	std::swap(_absolute, path._absolute);
 }
-
 
 Path& Path::assign(const Path& path)
 {
@@ -163,7 +146,6 @@ Path& Path::assign(const Path& path)
 	return *this;
 }
 
-
 Path& Path::assign(const std::string& path)
 {
 #if defined(POCO_OS_FAMILY_VMS)
@@ -176,7 +158,6 @@ Path& Path::assign(const std::string& path)
 	return *this;
 }
 
-	
 Path& Path::assign(const std::string& path, Style style)
 {
 	switch (style)
@@ -203,12 +184,10 @@ Path& Path::assign(const std::string& path, Style style)
 	return *this;
 }
 
-
 Path& Path::assign(const char* path)
 {
 	return assign(std::string(path));
 }
-
 
 std::string Path::toString() const
 {
@@ -221,7 +200,6 @@ std::string Path::toString() const
 #endif
 }
 
-	
 std::string Path::toString(Style style) const
 {
 	switch (style)
@@ -242,7 +220,6 @@ std::string Path::toString(Style style) const
 	return std::string();
 }
 
-
 bool Path::tryParse(const std::string& path)
 {
 	try
@@ -257,7 +234,6 @@ bool Path::tryParse(const std::string& path)
 		return false;
 	}
 }
-
 
 bool Path::tryParse(const std::string& path, Style style)
 {
@@ -274,7 +250,6 @@ bool Path::tryParse(const std::string& path, Style style)
 	}
 }
 
-
 Path& Path::parseDirectory(const std::string& path)
 {
 	assign(path);
@@ -288,7 +263,6 @@ Path& Path::parseDirectory(const std::string& path, Style style)
 	return makeDirectory();
 }
 
-
 Path& Path::makeDirectory()
 {
 #if defined(POCO_OS_FAMILY_VMS)
@@ -300,7 +274,6 @@ Path& Path::makeDirectory()
 	_version.clear();
 	return *this;
 }
-
 
 Path& Path::makeFile()
 {
@@ -315,12 +288,10 @@ Path& Path::makeFile()
 	return *this;
 }
 
-
 Path& Path::makeAbsolute()
 {
 	return makeAbsolute(current());
 }
-
 
 Path& Path::makeAbsolute(const Path& base)
 {
@@ -340,7 +311,6 @@ Path& Path::makeAbsolute(const Path& base)
 	return *this;
 }
 
-
 Path Path::absolute() const
 {
 	Path result(*this);
@@ -350,7 +320,6 @@ Path Path::absolute() const
 	}
 	return result;
 }
-
 
 Path Path::absolute(const Path& base) const
 {
@@ -362,13 +331,11 @@ Path Path::absolute(const Path& base) const
 	return result;
 }
 
-
 Path Path::parent() const
 {
 	Path p(*this);
 	return p.makeParent();
 }
-
 
 Path& Path::makeParent()
 {
@@ -395,7 +362,6 @@ Path& Path::makeParent()
 	return *this;
 }
 
-
 Path& Path::append(const Path& path)
 {
 	makeDirectory();
@@ -404,7 +370,6 @@ Path& Path::append(const Path& path)
 	_version = path._version;
 	return *this;
 }
-
 
 Path& Path::resolve(const Path& path)
 {
@@ -421,14 +386,12 @@ Path& Path::resolve(const Path& path)
 	return *this;
 }
 
-
 Path& Path::setNode(const std::string& node)
 {
 	_node     = node;
 	_absolute = _absolute || !node.empty();
 	return *this;
 }
-
 	
 Path& Path::setDevice(const std::string& device)
 {
@@ -437,7 +400,6 @@ Path& Path::setDevice(const std::string& device)
 	return *this;
 }
 
-	
 const std::string& Path::directory(int n) const
 {
 	//poco_assert (0 <= n && n <= _dirs.size());
@@ -447,7 +409,6 @@ const std::string& Path::directory(int n) const
 	else
 		return _name;	
 }
-
 
 const std::string& Path::operator [] (int n) const
 {
@@ -459,7 +420,6 @@ const std::string& Path::operator [] (int n) const
 		return _name;	
 }
 
-	
 Path& Path::pushDirectory(const std::string& dir)
 {
 	if (!dir.empty() && dir != ".")
@@ -487,7 +447,6 @@ Path& Path::pushDirectory(const std::string& dir)
 	return *this;
 }
 
-	
 Path& Path::popDirectory()
 {
 	//poco_assert (!_dirs.empty());
@@ -495,7 +454,6 @@ Path& Path::popDirectory()
 	_dirs.pop_back();
 	return *this;
 }
-
 
 Path& Path::popFrontDirectory()
 {
@@ -505,14 +463,12 @@ Path& Path::popFrontDirectory()
 	_dirs.erase(it);
 	return *this;
 }
-
 	
 Path& Path::setFileName(const std::string& name)
 {
 	_name = name;
 	return *this;
 }
-
 
 Path& Path::setBaseName(const std::string& name)
 {
@@ -526,7 +482,6 @@ Path& Path::setBaseName(const std::string& name)
 	return *this;
 }
 
-
 std::string Path::getBaseName() const
 {
 	std::string::size_type pos = _name.rfind('.');
@@ -535,7 +490,6 @@ std::string Path::getBaseName() const
 	else
 		return _name;
 }
-
 
 Path& Path::setExtension(const std::string& extension)
 {
@@ -548,7 +502,6 @@ Path& Path::setExtension(const std::string& extension)
 	return *this;
 }
 
-			
 std::string Path::getExtension() const
 {
 	std::string::size_type pos = _name.rfind('.');
@@ -557,7 +510,6 @@ std::string Path::getExtension() const
 	else
 		return std::string();
 }
-
 
 Path& Path::clear()
 {
@@ -570,42 +522,35 @@ Path& Path::clear()
 	return *this;
 }
 
-
 std::string Path::current()
 {
-	return PathImpl::currentImpl();
+   return platform::Path::current();
 }
 
-	
 std::string Path::home()
 {
-	return PathImpl::homeImpl();
+   return platform::Path::home();
 }
 
-	
 std::string Path::temp()
 {
-	return PathImpl::tempImpl();
+   return platform::Path::temp();
 }
-
 
 std::string Path::null()
 {
-	return PathImpl::nullImpl();
+   return platform::Path::null();
 }
 
-	
 std::string Path::expand(const std::string& path)
 {
-	return PathImpl::expandImpl(path);
+   return platform::Path::expand(path);
 }
-
 
 void Path::listRoots(std::vector<std::string>& roots)
 {
-	PathImpl::listRootsImpl(roots);
+   platform::Path::listRoots(roots);
 }
-
 
 bool Path::find(StringVec::const_iterator it, StringVec::const_iterator end, const std::string& name, Path& path)
 {
@@ -634,13 +579,11 @@ bool Path::find(StringVec::const_iterator it, StringVec::const_iterator end, con
 	return false;
 }
 
-
 bool Path::find(const std::string& pathList, const std::string& name, Path& path)
 {
 	StringTokenizer st(pathList, std::string(1, pathSeparator()), StringTokenizer::TOK_IGNORE_EMPTY + StringTokenizer::TOK_TRIM);
 	return find(st.begin(), st.end(), name, path);
 }
-
 
 void Path::parseUnix(const std::string& path)
 {
@@ -693,7 +636,6 @@ void Path::parseUnix(const std::string& path)
 	}
 }
 
-
 void Path::parseWindows(const std::string& path)
 {
 	clear();
@@ -738,7 +680,6 @@ void Path::parseWindows(const std::string& path)
 	if (!_node.empty() && _dirs.empty() && !_name.empty())
 		makeDirectory();
 }
-
 
 void Path::parseVMS(const std::string& path)
 {
@@ -859,7 +800,6 @@ void Path::parseVMS(const std::string& path)
 	}
 }
 
-
 void Path::parseGuess(const std::string& path)
 {
 	bool hasBackslash   = false;
@@ -914,7 +854,6 @@ void Path::parseGuess(const std::string& path)
 	}
 }
 
-
 std::string Path::buildUnix() const
 {
 	std::string result;
@@ -936,7 +875,6 @@ std::string Path::buildUnix() const
 	result.append(_name);
 	return result;
 }
-
 
 std::string Path::buildWindows() const
 {
@@ -964,7 +902,6 @@ std::string Path::buildWindows() const
 	result.append(_name);
 	return result;
 }
-
 
 std::string Path::buildVMS() const
 {
@@ -1004,7 +941,6 @@ std::string Path::buildVMS() const
 	return result;
 }
 
-
 std::string Path::transcode(const std::string& path)
 {
 #if defined(_WIN32) && defined(POCO_WIN32_UTF8)
@@ -1024,5 +960,4 @@ std::string Path::transcode(const std::string& path)
 	return path;
 }
 
-
-} // namespace Poco
+} // namespace nanogear

@@ -16,17 +16,14 @@
 //
 
 
-#ifndef Foundation_Path_INCLUDED
-#define Foundation_Path_INCLUDED
+#ifndef PATH_H
+#define PATH_H
 
-
-//include "Poco/Foundation.h"
 #include <vector>
 #include <string>
 
-
-namespace nanogear {
-
+namespace nanogear
+{
 
 class Path
 	/// This class represents filesystem paths in a 
@@ -469,8 +466,7 @@ inline void swap(Path& p1, Path& p2)
 	p1.swap(p2);
 }
 
+} // namespace nanogear
 
-} // namespace Poco
 
-
-#endif // Foundation_Path_INCLUDED
+#endif // PATH_H

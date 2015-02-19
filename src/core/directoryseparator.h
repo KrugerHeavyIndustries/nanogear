@@ -31,7 +31,9 @@ namespace nanogear
 
 struct DirectorySeparator
 {
-   DirectorySeparator();
+   DirectorySeparator()
+   {
+   };
 
    operator char() const;
 

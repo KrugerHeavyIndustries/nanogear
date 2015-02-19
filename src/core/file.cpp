@@ -1,18 +1,25 @@
-//
-// File.cpp
-//
-// $Id: //poco/1.4/Foundation/src/File.cpp#3 $
-//
-// Library: Foundation
-// Package: Filesystem
-// Module:  File
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
-// and Contributors.
-//
-// SPDX-License-Identifier:	BSL-1.0
-//
-
+/*
+ * Nanogear - C++ web development framework
+ *
+ * This library is based on Restlet (R) <http://www.restlet.org> by Noelios Technologies
+ * Copyright (C) 2005-2008 by Noelios Technologies <http://www.noelios.com>
+ * Restlet is a registered trademark of Noelios Technologies. All other marks and
+ * trademarks are property of their respective owners.
+ *
+ * Copyright (C) 2008-2009 Chris Kruger.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "file.h"
 #include "path.h"
@@ -34,7 +41,6 @@
 #include "File_VMS.cpp"
 #endif
 
-
 namespace nanogear
 {
 
@@ -42,177 +48,149 @@ File::File()
 {
 }
 
-
-File::File(const std::string& path): FileImpl(path)
+File::File(const std::string& path) : platform::File(path)
 {
 }
 
-
-File::File(const char* path): FileImpl(std::string(path))
+File::File(const char* path): platform::File(std::string(path))
 {
 }
 
-
-File::File(const Path& path): FileImpl(path.toString())
+File::File(const Path& path): platform::File(path.toString())
 {
 }
 
-
-File::File(const File& file): FileImpl(file.getPathImpl())
+File::File(const File& file): platform::File(file.getPath())
 {
 }
-
 
 File::~File()
 {
 }
 
-
-File& File::operator = (const File& file)
+File& File::operator=(const File& file)
 {
-	setPathImpl(file.getPathImpl());
+	setPath(file.getPath());
 	return *this;
 }
 
-
-File& File::operator = (const std::string& path)
+File& File::operator=(const std::string& path)
 {
-	setPathImpl(path);
+	setPath(path);
 	return *this;
 }
 
-
-File& File::operator = (const char* path)
+File& File::operator=(const char* path)
 {
 	//poco_check_ptr (path);
-	setPathImpl(path);
+	setPath(path);
 	return *this;
 }
 
-
-File& File::operator = (const Path& path)
+File& File::operator=(const Path& path)
 {
-	setPathImpl(path.toString());
+	setPath(path.toString());
 	return *this;
 }
-
 
 void File::swap(File& file)
 {
-	swapImpl(file);
+	swap(file);
 }
-
 
 bool File::exists() const
 {
-	return existsImpl();
+   return platform::File::exists();
 }
 
-	
 bool File::canRead() const
 {
-	return canReadImpl();
+	return platform::File::canRead();
 }
 
-	
 bool File::canWrite() const
 {
-	return canWriteImpl();
+	return platform::File::canWrite();
 }
-
 
 bool File::canExecute() const
 {
-	return canExecuteImpl();
+	return platform::File::canExecute();
 }
-
 
 bool File::isFile() const
 {
-	return isFileImpl();
+	return platform::File::isFile();
 }
 
-	
 bool File::isDirectory() const
 {
-	return isDirectoryImpl();
+	return platform::File::isDirectory();
 }
-
 
 bool File::isLink() const
 {
-	return isLinkImpl();
+	return platform::File::isLink();
 }
-
 
 bool File::isDevice() const
 {
-	return isDeviceImpl();
+	return platform::File::isDevice();
 }
-
 
 bool File::isHidden() const
 {
-	return isHiddenImpl();
+	return platform::File::isHidden();
 }
-
 
 Timestamp File::created() const
 {
-	return createdImpl();
+	return platform::File::created();
 }
 
-	
 Timestamp File::getLastModified() const
 {
-	return getLastModifiedImpl();
+	return platform::File::getLastModified();
 }
-
 	
 File& File::setLastModified(const Timestamp& ts)
 {
-	setLastModifiedImpl(ts);
+	platform::File::setLastModified(ts);
 	return *this;
 }
 
-	
 File::FileSize File::getSize() const
 {
-	return getSizeImpl();
+	return platform::File::getSize();
 }
 
-	
-File& File::setSize(FileSizeImpl size)
+File& File::setSize(FileSize size)
 {
-	setSizeImpl(size);
+	platform::File::setSize(size);
 	return *this;
 }
 
-	
 File& File::setWriteable(bool flag)
 {
-	setWriteableImpl(flag);
+	platform::File::setWriteable(flag);
 	return *this;
 }
-
 
 File& File::setReadOnly(bool flag)
 {
-	setWriteableImpl(!flag);
+	platform::File::setWriteable(!flag);
 	return *this;
 }
-
 
 File& File::setExecutable(bool flag)
 {
-	setExecutableImpl(flag);
+	platform::File::setExecutable(flag);
 	return *this;
 }
 
-	
 void File::copyTo(const std::string& path) const
 {
-	Path src(getPathImpl());
+	Path src(getPath());
 	Path dest(path);
 	File destFile(path);
 	if ((destFile.exists() && destFile.isDirectory()) || dest.isDirectory())
@@ -223,16 +201,15 @@ void File::copyTo(const std::string& path) const
 	if (isDirectory())
 		copyDirectory(dest.toString());
 	else
-		copyToImpl(dest.toString());
+      platform::File::copyTo(dest.toString());
 }
-
 
 void File::copyDirectory(const std::string& path) const
 {
 	File target(path);
 	target.createDirectories();
 
-	Path src(getPathImpl());
+	Path src(platform::File::getPath());
 	src.makeFile();
 	DirectoryIterator it(src);
 	DirectoryIterator end;
@@ -242,22 +219,19 @@ void File::copyDirectory(const std::string& path) const
 	}
 }
 
-
 void File::moveTo(const std::string& path)
 {
 	copyTo(path);
 	remove(true);
-	setPathImpl(path);
+	platform::File::setPath(path);
 }
 
-	
 void File::renameTo(const std::string& path)
 {
-	renameToImpl(path);
-	setPathImpl(path);
+	platform::File::renameTo(path);
+	platform::File::setPath(path);
 }
 
-	
 void File::remove(bool recursive)
 {
 	if (recursive && !isLink() && isDirectory())
@@ -269,27 +243,24 @@ void File::remove(bool recursive)
 			it->remove(true);
 		}
 	}
-	removeImpl();
+	platform::File::remove();
 }
-
 
 bool File::createFile()
 {
-	return createFileImpl();
+   return platform::File::createFile();
 }
-
 
 bool File::createDirectory()
 {
-	return createDirectoryImpl();
+	return platform::File::createDirectory();
 }
-
 
 void File::createDirectories()
 {
 	if (!exists())
 	{
-		Path p(getPathImpl());
+		Path p(platform::File::getPath());
 		p.makeDirectory();
 		if (p.depth() > 1)
 		{
@@ -297,10 +268,9 @@ void File::createDirectories()
 			File f(p);
 			f.createDirectories();
 		}
-		createDirectoryImpl();
+		platform::File::createDirectory();
 	}
 }
-
 
 void File::list(std::vector<std::string>& files) const
 {
@@ -314,7 +284,6 @@ void File::list(std::vector<std::string>& files) const
 	}
 }
 
-
 void File::list(std::vector<File>& files) const
 {
 	files.clear();
@@ -327,11 +296,9 @@ void File::list(std::vector<File>& files) const
 	}
 }
 
-
 void File::handleLastError(const std::string& path)
 {
-	handleLastErrorImpl(path);
+	platform::File::handleLastError(path);
 }
 
-
-} // namespace Poco
+} // namespace nanogear

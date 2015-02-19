@@ -16,11 +16,9 @@
 #define PATH_MAX 1024 // fallback
 #endif
 
+namespace nanogear { namespace platform {
 
-namespace nanogear {
-
-
-std::string PathImpl::currentImpl()
+std::string Path::current()
 {
 	std::string path;
 	char cwd[PATH_MAX];
@@ -34,8 +32,7 @@ std::string PathImpl::currentImpl()
 	return path;
 }
 
-
-std::string PathImpl::homeImpl()
+std::string Path::home()
 {
 #if defined(POCO_VXWORKS)
 	if (EnvironmentImpl::hasImpl("HOME"))
@@ -62,7 +59,7 @@ std::string PathImpl::homeImpl()
 }
 
 
-std::string PathImpl::tempImpl()
+std::string Path::temp()
 {
 	std::string path;
 	char* tmp = getenv("TMPDIR");
@@ -80,7 +77,7 @@ std::string PathImpl::tempImpl()
 }
 
 
-std::string PathImpl::nullImpl()
+std::string Path::null()
 {
 #if defined(POCO_VXWORKS)
 	return "/null";
@@ -89,8 +86,7 @@ std::string PathImpl::nullImpl()
 #endif
 }
 
-
-std::string PathImpl::expandImpl(const std::string& path)
+std::string Path::expand(const std::string& path)
 {
 	std::string result;
 	std::string::const_iterator it  = path.begin();
@@ -100,7 +96,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 		++it;
 		if (it != end && *it == '/')
 		{
-			result += homeImpl(); ++it;
+			result += home(); ++it;
 		}
 		else result += '~';
 	}
@@ -128,12 +124,11 @@ std::string PathImpl::expandImpl(const std::string& path)
 	return result;
 }
 
-
-void PathImpl::listRootsImpl(std::vector<std::string>& roots)
+void Path::listRoots(std::vector<std::string>& roots)
 {
 	roots.clear();
 	roots.push_back("/");
 }
 
-
-} // namespace Poco
+} // namespace platform
+} // namespace nanogear

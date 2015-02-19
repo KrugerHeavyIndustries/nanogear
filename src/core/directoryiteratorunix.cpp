@@ -18,44 +18,43 @@
 #include "path.h"
 #include "file.h"
 
-namespace nanogear {
-   
-   
-   DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(0), _rc(1)
+namespace nanogear { namespace platform
+{
+   DirectoryIterator::DirectoryIterator(const std::string& path)
+   : 	m_dir(0),
+   	m_rc(1)
    {
       Path p(path);
       p.makeFile();
       
 #if defined(POCO_VXWORKS)
-      _pDir = opendir(const_cast<char*>(p.toString().c_str()));
+      m_dir = opendir(const_cast<char*>(p.toString().c_str()));
 #else
-      _pDir = opendir(p.toString().c_str());
+      m_dir = opendir(p.toString().c_str());
 #endif
-      if (!_pDir) File::handleLastError(path);
+      if (!m_dir) nanogear::File::handleLastError(path);
       
       next();
    }
-   
-   
-   DirectoryIteratorImpl::~DirectoryIteratorImpl()
+
+   DirectoryIterator::~DirectoryIterator()
    {
-      if (_pDir) closedir(_pDir);
+      if (m_dir) closedir(m_dir);
    }
-   
-   
-   const std::string& DirectoryIteratorImpl::next()
+
+   const std::string& DirectoryIterator::next()
    {
       do
       {
-         struct dirent* pEntry = readdir(_pDir);
-         if (pEntry)
-            _current = pEntry->d_name;
+         struct dirent* entry = readdir(m_dir);
+         if (entry)
+            m_current = entry->d_name;
          else
-            _current.clear();
+            m_current.clear();
       }
-      while (_current == "." || _current == "..");
-      return _current;
+      while (m_current == "." || m_current == "..");
+      return m_current;
    }
-   
-   
-} // namespace Poco
+
+} // namespace platform
+} // namespace nanogear

@@ -33,14 +33,10 @@
 #define PLATFORM_PATH_SEPARATOR ':'
 #endif
 
-using namespace std;
-
 namespace nanogear
 {
-
-DirectorySeparator::DirectorySeparator()
-{
-}
+   
+using std::string;
 
 DirectorySeparator::operator char() const
 {
@@ -49,17 +45,17 @@ DirectorySeparator::operator char() const
 
 DirectorySeparator::operator string() const
 {
-   return std::string(1, PLATFORM_DIRECTORY_SEPARATOR);
+   return string(1, PLATFORM_DIRECTORY_SEPARATOR);
 }
 
-std::string operator+(const string& lhs, const DirectorySeparator& rhs)
+string operator+(const string& lhs, const DirectorySeparator& rhs)
 {
    return lhs + string(rhs);
 }
 
-std::string operator+(const char* lhs, const DirectorySeparator& rhs)
+string operator+(const char* lhs, const DirectorySeparator& rhs)
 {
    return lhs + string(rhs);
 }
 
-}
+} // namespace nanogear

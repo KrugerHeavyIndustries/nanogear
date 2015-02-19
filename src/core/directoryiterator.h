@@ -1,20 +1,25 @@
-//
-// DirectoryIterator.h
-//
-// $Id: //poco/1.4/Foundation/include/Poco/DirectoryIterator.h#1 $
-//
-// Library: Foundation
-// Package: Filesystem
-// Module:  DirectoryIterator
-//
-// Definition of the DirectoryIterator class.
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
-// and Contributors.
-//
-// SPDX-License-Identifier:	BSL-1.0
-//
-
+/*
+ * Nanogear - C++ web development framework
+ *
+ * This library is based on Restlet (R) <http://www.restlet.org> by Noelios Technologies
+ * Copyright (C) 2005-2008 by Noelios Technologies <http://www.noelios.com>
+ * Restlet is a registered trademark of Noelios Technologies. All other marks and
+ * trademarks are property of their respective owners.
+ *
+ * Copyright (C) 2008-2009 Chris Kruger.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef Foundation_DirectoryIterator_INCLUDED
 #define Foundation_DirectoryIterator_INCLUDED
@@ -23,11 +28,12 @@
 #include "path.h"
 
 namespace nanogear {
-   
-   
-   class DirectoryIteratorImpl;
-   
-   
+
+   namespace platform
+   {
+   	class DirectoryIterator;
+   }
+
    class DirectoryIterator
    /// The DirectoryIterator class is used to enumerate
    /// all files in a directory.
@@ -87,66 +93,59 @@ namespace nanogear {
       bool operator != (const DirectoryIterator& iterator) const;
       
    protected:
-      Path _path;
-      File _file;
+      Path m_path;
+      File m_file;
       
    private:
-      DirectoryIteratorImpl* _pImpl;
+
+      platform::DirectoryIterator* m_impl;
    };
-   
-   
+
    //
    // inlines
    //
    inline const std::string& DirectoryIterator::name() const
    {
-      return _path.getFileName();
+      return m_path.getFileName();
    }
-   
-   
+
    inline const Path& DirectoryIterator::path() const
    {
-      return _path;
+      return m_path;
    }
-   
-   
+
    inline const File& DirectoryIterator::operator * () const
    {
-      return _file;
+      return m_file;
    }
-   
-   
+
    inline File& DirectoryIterator::operator * ()
    {
-      return _file;
+      return m_file;
    }
-   
-   
+
    inline const File* DirectoryIterator::operator -> () const
    {
-      return &_file;
+      return &m_file;
    }
-   
-   
+
    inline File* DirectoryIterator::operator -> ()
    {
-      return &_file;
+      return &m_file;
    }
-   
-   
+
    inline bool DirectoryIterator::operator == (const DirectoryIterator& iterator) const
    {
       return name() == iterator.name();
    }
-   
-   
+
    inline bool DirectoryIterator::operator != (const DirectoryIterator& iterator) const
    {
       return name() != iterator.name();
    }
    
    
-} // namespace Poco
+} // namespace nanogear
 
 
 #endif // Foundation_DirectoryIterator_INCLUDED

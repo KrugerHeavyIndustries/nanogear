@@ -16,28 +16,24 @@
 //
 
 
-#ifndef Foundation_Path_UNIX_INCLUDED
-#define Foundation_Path_UNIX_INCLUDED
-
+#ifndef PATH_UNIX_H
+#define PATH_UNIX_H
 
 #include <vector>
 
-namespace nanogear {
-   
-   
-   class PathImpl
+namespace nanogear { namespace platform
+{
+   class Path
    {
    public:
-      static std::string currentImpl();
-      static std::string homeImpl();
-      static std::string tempImpl();
-      static std::string nullImpl();
-      static std::string expandImpl(const std::string& path);
-      static void listRootsImpl(std::vector<std::string>& roots);
+      static std::string current();
+      static std::string home();
+      static std::string temp();
+      static std::string null();
+      static std::string expand(const std::string& path);
+      static void listRoots(std::vector<std::string>& roots);
    };
-   
-   
-} // namespace Poco
+} // namespace platform
+} // namespace nanogear
 
-
-#endif // Foundation_Path_UNIX_INCLUDED
+#endif // PATH_UNIX_H

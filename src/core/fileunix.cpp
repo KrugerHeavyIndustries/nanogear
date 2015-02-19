@@ -30,35 +30,30 @@
 #include <utime.h>
 #include <cstring>
 
+namespace nanogear { namespace platform
+{
 
-namespace nanogear {
-
-
-FileImpl::FileImpl()
+File::File()
 {
 }
 
-
-FileImpl::FileImpl(const std::string& path): _path(path)
+File::File(const std::string& path): _path(path)
 {
 	std::string::size_type n = _path.size();
 	if (n > 1 && _path[n - 1] == '/')
 		_path.resize(n - 1);
 }
 
-
-FileImpl::~FileImpl()
+File::~File()
 {
 }
 
-
-void FileImpl::swapImpl(FileImpl& file)
+void File::swap(File& file)
 {
 	std::swap(_path, file._path);
 }
 
-
-void FileImpl::setPathImpl(const std::string& path)
+void File::setPath(const std::string& path)
 {
 	_path = path;
 	std::string::size_type n = _path.size();
@@ -66,8 +61,7 @@ void FileImpl::setPathImpl(const std::string& path)
 		_path.resize(n - 1);
 }
 
-
-bool FileImpl::existsImpl() const
+bool File::exists() const
 {
 	//poco_assert (!_path.empty());
 
@@ -75,8 +69,7 @@ bool FileImpl::existsImpl() const
 	return stat(_path.c_str(), &st) == 0;
 }
 
-
-bool FileImpl::canReadImpl() const
+bool File::canRead() const
 {
 	//poco_assert (!_path.empty());
 
@@ -90,12 +83,11 @@ bool FileImpl::canReadImpl() const
 		else
 			return (st.st_mode & S_IROTH) != 0 || geteuid() == 0;
 	}
-	else handleLastErrorImpl(_path);
+	else handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::canWriteImpl() const
+bool File::canWrite() const
 {
 	//poco_assert (!_path.empty());
 
@@ -109,12 +101,11 @@ bool FileImpl::canWriteImpl() const
 		else
 			return (st.st_mode & S_IWOTH) != 0 || geteuid() == 0;
 	}
-	else handleLastErrorImpl(_path);
+	else handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::canExecuteImpl() const
+bool File::canExecute() const
 {
 	//poco_assert (!_path.empty());
 
@@ -128,12 +119,11 @@ bool FileImpl::canExecuteImpl() const
 		else
 			return (st.st_mode & S_IXOTH) != 0;
 	}
-	else handleLastErrorImpl(_path);
+	else handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::isFileImpl() const
+bool File::isFile() const
 {
 	//poco_assert (!_path.empty());
 
@@ -141,12 +131,11 @@ bool FileImpl::isFileImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISREG(st.st_mode);
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::isDirectoryImpl() const
+bool File::isDirectory() const
 {
 	//poco_assert (!_path.empty());
 
@@ -154,12 +143,11 @@ bool FileImpl::isDirectoryImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISDIR(st.st_mode);
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::isLinkImpl() const
+bool File::isLink() const
 {
 	//poco_assert (!_path.empty());
 
@@ -167,12 +155,11 @@ bool FileImpl::isLinkImpl() const
 	if (lstat(_path.c_str(), &st) == 0)
 		return S_ISLNK(st.st_mode);
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::isDeviceImpl() const
+bool File::isDevice() const
 {
 	//poco_assert (!_path.empty());
 
@@ -180,12 +167,11 @@ bool FileImpl::isDeviceImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::isHiddenImpl() const
+bool File::isHidden() const
 {
 	//poco_assert (!_path.empty());
 	Path p(_path);
@@ -194,8 +180,7 @@ bool FileImpl::isHiddenImpl() const
 	return p.getFileName()[0] == '.';
 }
 
-
-Timestamp FileImpl::createdImpl() const
+Timestamp File::created() const
 {
 	//poco_assert (!_path.empty());
 
@@ -213,12 +198,11 @@ Timestamp FileImpl::createdImpl() const
 		return Timestamp::fromEpochTime(st.st_ctime);
 #endif 
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return 0;
 }
 
-
-Timestamp FileImpl::getLastModifiedImpl() const
+Timestamp File::getLastModified() const
 {
 	//poco_assert (!_path.empty());
 
@@ -226,12 +210,11 @@ Timestamp FileImpl::getLastModifiedImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_mtime);
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return 0;
 }
 
-
-void FileImpl::setLastModifiedImpl(const Timestamp& ts)
+void File::setLastModified(const Timestamp& ts)
 {
 	//poco_assert (!_path.empty());
 
@@ -239,11 +222,10 @@ void FileImpl::setLastModifiedImpl(const Timestamp& ts)
 	tb.actime  = ts.epochTime();
 	tb.modtime = ts.epochTime();
 	if (utime(_path.c_str(), &tb) != 0)
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 }
 
-
-FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
+File::FileSize File::getSize() const
 {
 	//poco_assert (!_path.empty());
 
@@ -251,27 +233,25 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 	if (stat(_path.c_str(), &st) == 0)
 		return st.st_size;
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return 0;
 }
 
-
-void FileImpl::setSizeImpl(FileSizeImpl size)
+void File::setSize(FileSize size)
 {
 	//poco_assert (!_path.empty());
 
 	if (truncate(_path.c_str(), size) != 0)
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 }
 
-
-void FileImpl::setWriteableImpl(bool flag)
+void File::setWriteable(bool flag)
 {
 	//poco_assert (!_path.empty());
 
 	struct stat st;
 	if (stat(_path.c_str(), &st) != 0) 
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	mode_t mode;
 	if (flag)
 	{
@@ -283,17 +263,16 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode = st.st_mode & ~wmask;
 	}
 	if (chmod(_path.c_str(), mode) != 0) 
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 }
 
-
-void FileImpl::setExecutableImpl(bool flag)
+void File::setExecutable(bool flag)
 {
 	//poco_assert (!_path.empty());
 
 	struct stat st;
 	if (stat(_path.c_str(), &st) != 0) 
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	mode_t mode;
 	if (flag)
 	{
@@ -305,22 +284,21 @@ void FileImpl::setExecutableImpl(bool flag)
 		mode = st.st_mode & ~wmask;
 	}
 	if (chmod(_path.c_str(), mode) != 0) 
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 }
 
-
-void FileImpl::copyToImpl(const std::string& path) const
+void File::copyTo(const std::string& path) const
 {
 	//poco_assert (!_path.empty());
 
 	int sd = open(_path.c_str(), O_RDONLY);
-	if (sd == -1) handleLastErrorImpl(_path);
+	if (sd == -1) handleLastError(_path);
 
 	struct stat st;
 	if (fstat(sd, &st) != 0) 
 	{
 		close(sd);
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	}
 	const long blockSize = st.st_blksize;
 
@@ -328,7 +306,7 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (dd == -1)
 	{
 		close(sd);
-		handleLastErrorImpl(path);
+		handleLastError(path);
 	}
    std::vector<char> buffer(blockSize);
    try
@@ -337,10 +315,10 @@ void FileImpl::copyToImpl(const std::string& path) const
       while ((n = read(sd, buffer.data(), blockSize)) > 0)
 		{
 			if (write(dd, buffer.data(), n) != n)
-				handleLastErrorImpl(path);
+				handleLastError(path);
 		}
 		if (n < 0)
-			handleLastErrorImpl(_path);
+			handleLastError(_path);
 	}
 	catch (...)
 	{
@@ -352,36 +330,33 @@ void FileImpl::copyToImpl(const std::string& path) const
 	if (fsync(dd) != 0) 
 	{
 		close(dd);
-		handleLastErrorImpl(path);
+		handleLastError(path);
 	}
 	if (close(dd) != 0)
-		handleLastErrorImpl(path);
+		handleLastError(path);
 }
 
-
-void FileImpl::renameToImpl(const std::string& path)
+void File::renameTo(const std::string& path)
 {
 	//poco_assert (!_path.empty());
 
 	if (rename(_path.c_str(), path.c_str()) != 0)
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 }
 
-
-void FileImpl::removeImpl()
+void File::remove()
 {
 	//poco_assert (!_path.empty());
 
 	int rc;
-	if (!isLinkImpl() && isDirectoryImpl())
+	if (!isLink() && isDirectory())
 		rc = rmdir(_path.c_str());
 	else
 		rc = unlink(_path.c_str());
-	if (rc) handleLastErrorImpl(_path);
+	if (rc) handleLastError(_path);
 }
 
-
-bool FileImpl::createFileImpl()
+bool File::createFile()
 {
 	//poco_assert (!_path.empty());
 	
@@ -394,24 +369,22 @@ bool FileImpl::createFileImpl()
 	if (n == -1 && errno == EEXIST)
 		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return false;
 }
 
-
-bool FileImpl::createDirectoryImpl()
+bool File::createDirectory()
 {
 	//poco_assert (!_path.empty());
 
-	if (existsImpl() && isDirectoryImpl())
+	if (exists() && isDirectory())
 		return false;
 	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0) 
-		handleLastErrorImpl(_path);
+		handleLastError(_path);
 	return true;
 }
 
-
-void FileImpl::handleLastErrorImpl(const std::string& path)
+void File::handleLastError(const std::string& path)
 {
    /*
 	switch (errno)
@@ -451,5 +424,5 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
     */
 }
 
-
-} // namespace Poco
+} // namespace platform
+} // namespace nanogear

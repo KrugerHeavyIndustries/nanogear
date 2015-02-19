@@ -1,30 +1,34 @@
-//
-// StringTokenizer.h
-//
-// $Id: //poco/1.4/Foundation/include/Poco/StringTokenizer.h#1 $
-//
-// Library: Foundation
-// Package: Core
-// Module:  StringTokenizer
-//
-// Definition of the StringTokenizer class.
-//
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
-// and Contributors.
-//
-// SPDX-License-Identifier:	BSL-1.0
-//
+/*
+ * Nanogear - C++ web development framework
+ *
+ * This library is based on Restlet (R) <http://www.restlet.org> by Noelios Technologies
+ * Copyright (C) 2005-2008 by Noelios Technologies <http://www.noelios.com>
+ * Restlet is a registered trademark of Noelios Technologies. All other marks and
+ * trademarks are property of their respective owners.
+ *
+ * Copyright (C) 2008-2009 Chris Kruger.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+#ifndef STRINGTOKENIZER_H
+#define STRINGTOKENIZER_H
 
-#ifndef Foundation_StringTokenizer_INCLUDED
-#define Foundation_StringTokenizer_INCLUDED
-
-//#include "Poco/Foundation.h"
-//#include "Poco/Exception.h"
 #include <vector>
 #include <cstddef>
 
-namespace nanogear {
+namespace nanogear
+{
    
    class StringTokenizer
    /// A simple tokenizer that splits a string into
@@ -87,45 +91,41 @@ namespace nanogear {
       
       void trim (std::string& token);
       
-      TokenVec _tokens;
+      TokenVec m_tokens;
    };
    
    
    //
    // inlines
    //
-   
+
    inline StringTokenizer::Iterator StringTokenizer::begin() const
    {
-      return _tokens.begin();
+      return m_tokens.begin();
    }
    
    
    inline StringTokenizer::Iterator StringTokenizer::end() const
    {
-      return _tokens.end();
+      return m_tokens.end();
    }
 
    inline std::string& StringTokenizer::operator [] (std::size_t index)
    {
       //if (index >= _tokens.size()) throw RangeException();
-      return _tokens[index];
+      return m_tokens[index];
    }
 
    inline const std::string& StringTokenizer::operator [] (std::size_t index) const
    {
       //if (index >= _tokens.size()) throw RangeException();
-      return _tokens[index];
+      return m_tokens[index];
    }
-   
    
    inline std::size_t StringTokenizer::count() const
    {
-      return _tokens.size();
+      return m_tokens.size();
    }
-   
-   
-} // namespace Poco
+} // namespace nanogear
 
-
-#endif // Foundation_StringTokenizer_INCLUDED
+#endif // STRINGTOKENIZER_H

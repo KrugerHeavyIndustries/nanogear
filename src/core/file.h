@@ -1,6 +1,29 @@
+/*
+ * Nanogear - C++ web development framework
+ *
+ * This library is based on Restlet (R) <http://www.restlet.org> by Noelios Technologies
+ * Copyright (C) 2005-2008 by Noelios Technologies <http://www.noelios.com>
+ * Restlet is a registered trademark of Noelios Technologies. All other marks and
+ * trademarks are property of their respective owners.
+ *
+ * Copyright (C) 2008-2009 Chris Kruger.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#ifndef Foundation_File_INCLUDED
-#define Foundation_File_INCLUDED
+
+#ifndef FILE_H
+#define FILE_H
 
 #include "timestamp.h"
 #include <vector>
@@ -22,18 +45,16 @@
 #include "Poco/File_VMS.h"
 #endif
 
-
 namespace nanogear
 {
 
 class Path;
 
-
-class File: private FileImpl
-	/// The File class provides methods for working with a file.
+class File: private platform::File
+/// The File class provides methods for working with a file.
 {
 public:
-   typedef FileSizeImpl FileSize;
+   typedef platform::File::FileSize FileSize;
 
 	File();
 		/// Creates the file.
@@ -189,12 +210,12 @@ public:
 		/// Fills the vector with the names of all
 		/// files in the directory.
 
-	bool operator == (const File& file) const;
-	bool operator != (const File& file) const;
-	bool operator <  (const File& file) const;
-	bool operator <= (const File& file) const;
-	bool operator >  (const File& file) const;
-	bool operator >= (const File& file) const;
+	bool operator==(const File& file) const;
+	bool operator!=(const File& file) const;
+	bool operator<(const File& file) const;
+	bool operator<=(const File& file) const;
+	bool operator>(const File& file) const;
+	bool operator>=(const File& file) const;
 	
 	static void handleLastError(const std::string& path);
 		/// For internal use only. Throws an appropriate
@@ -211,53 +232,45 @@ protected:
 //
 inline const std::string& File::path() const
 {
-	return getPathImpl();
+   return platform::File::getPath();
 }
 
-
-inline bool File::operator == (const File& file) const
+inline bool File::operator==(const File& file) const
 {
-	return getPathImpl() == file.getPathImpl();
+   return path() == file.path();
 }
 
-
-inline bool File::operator != (const File& file) const
+inline bool File::operator!=(const File& file) const
 {
-	return getPathImpl() != file.getPathImpl();
+   return path() != file.path();
 }
-
 
 inline bool File::operator < (const File& file) const
 {
-	return getPathImpl() < file.getPathImpl();
+	return path() < file.path();
 }
-
 
 inline bool File::operator <= (const File& file) const
 {
-	return getPathImpl() <= file.getPathImpl();
+	return path() <= file.path();
 }
-
 
 inline bool File::operator > (const File& file) const
 {
-	return getPathImpl() > file.getPathImpl();
+	return path() > file.path();
 }
-
 
 inline bool File::operator >= (const File& file) const
 {
-	return getPathImpl() >= file.getPathImpl();
+	return path() >= file.path();
 }
-
 
 inline void swap(File& f1, File& f2)
 {
 	f1.swap(f2);
 }
 
-
-} // namespace Poco
+} // namespace nanogear
 
 
 #endif // Foundation_File_INCLUDED

@@ -27,123 +27,108 @@
 #include "DirectoryIterator_VMS.cpp"
 #endif
 
+namespace nanogear
+{
+   DirectoryIterator::DirectoryIterator(): m_impl(NULL)
+   {
+   }
 
-namespace nanogear {
-   
-   
-   DirectoryIterator::DirectoryIterator(): _pImpl(0)
+   DirectoryIterator::DirectoryIterator(const std::string& path): m_path(path), m_impl(new platform::DirectoryIterator(path))
    {
+      m_path.makeDirectory();
+      m_path.setFileName(m_impl->get());
+      m_file = m_path;
    }
    
-   
-   DirectoryIterator::DirectoryIterator(const std::string& path): _path(path), _pImpl(new DirectoryIteratorImpl(path))
+   DirectoryIterator::DirectoryIterator(const DirectoryIterator& iterator): m_path(iterator.m_path), m_impl(iterator.m_impl)
    {
-      _path.makeDirectory();
-      _path.setFileName(_pImpl->get());
-      _file = _path;
-   }
-   
-   
-   DirectoryIterator::DirectoryIterator(const DirectoryIterator& iterator): _path(iterator._path), _pImpl(iterator._pImpl)
-   {
-      if (_pImpl)
+      if (m_impl)
       {
-         _pImpl->duplicate();
-         _file = _path;
+         m_impl->duplicate();
+         m_file = m_path;
       }
    }
-   
-   
-   DirectoryIterator::DirectoryIterator(const File& file): _path(file.path()), _pImpl(new DirectoryIteratorImpl(file.path()))
+
+   DirectoryIterator::DirectoryIterator(const File& file): m_path(file.path()), m_impl(new platform::DirectoryIterator(file.path()))
    {
-      _path.makeDirectory();
-      _path.setFileName(_pImpl->get());
-      _file = _path;
+      m_path.makeDirectory();
+      m_path.setFileName(m_impl->get());
+      m_file = m_path;
    }
-   
-   
-   DirectoryIterator::DirectoryIterator(const Path& path): _path(path), _pImpl(new DirectoryIteratorImpl(path.toString()))
+
+   DirectoryIterator::DirectoryIterator(const Path& path): m_path(path), m_impl(new platform::DirectoryIterator(path.toString()))
    {
-      _path.makeDirectory();
-      _path.setFileName(_pImpl->get());
-      _file = _path;
+      m_path.makeDirectory();
+      m_path.setFileName(m_impl->get());
+      m_file = m_path;
    }
-   
-   
+
    DirectoryIterator::~DirectoryIterator()
    {
-      if (_pImpl) _pImpl->release();
+      if (m_impl) m_impl->release();
    }
-   
-   
+
    DirectoryIterator& DirectoryIterator::operator = (const DirectoryIterator& it)
    {
-      if (_pImpl) _pImpl->release();
-      _pImpl = it._pImpl;
-      if (_pImpl)
+      if (m_impl) m_impl->release();
+      m_impl = it.m_impl;
+      if (m_impl)
       {
-         _pImpl->duplicate();
-         _path = it._path;
-         _file = _path;
+         m_impl->duplicate();
+         m_path = it.m_path;
+         m_file = m_path;
       }
       return *this;
    }
-   
-   
+
    DirectoryIterator& DirectoryIterator::operator = (const File& file)
    {
-      if (_pImpl) _pImpl->release();
-      _pImpl = new DirectoryIteratorImpl(file.path());
-      _path.parseDirectory(file.path());
-      _path.setFileName(_pImpl->get());
-      _file = _path;
+      if (m_impl) m_impl->release();
+      m_impl = new platform::DirectoryIterator(file.path());
+      m_path.parseDirectory(file.path());
+      m_path.setFileName(m_impl->get());
+      m_file = m_path;
       return *this;
    }
-   
-   
+
    DirectoryIterator& DirectoryIterator::operator = (const Path& path)
    {
-      if (_pImpl) _pImpl->release();
-      _pImpl = new DirectoryIteratorImpl(path.toString());
-      _path = path;
-      _path.makeDirectory();
-      _path.setFileName(_pImpl->get());
-      _file = _path;
+      if (m_impl) m_impl->release();
+      m_impl = new platform::DirectoryIterator(path.toString());
+      m_path = path;
+      m_path.makeDirectory();
+      m_path.setFileName(m_impl->get());
+      m_file = m_path;
       return *this;
    }
-   
-   
+
    DirectoryIterator& DirectoryIterator::operator = (const std::string& path)
    {
-      if (_pImpl) _pImpl->release();
-      _pImpl = new DirectoryIteratorImpl(path);
-      _path.parseDirectory(path);
-      _path.setFileName(_pImpl->get());
-      _file = _path;
+      if (m_impl) m_impl->release();
+      m_impl = new platform::DirectoryIterator(path);
+      m_path.parseDirectory(path);
+      m_path.setFileName(m_impl->get());
+      m_file = m_path;
       return *this;
    }
-   
-   
+
    DirectoryIterator& DirectoryIterator::operator ++ ()
    {
-      if (_pImpl)
+      if (m_impl)
       {
-         _path.setFileName(_pImpl->next());
-         _file = _path;
+         m_path.setFileName(m_impl->next());
+         m_file = m_path;
       }
       return *this;
    }
-   
-   
+
    DirectoryIterator DirectoryIterator::operator ++ (int dummy)
    {
-      if (_pImpl)
+      if (m_impl)
       {
-         _path.setFileName(_pImpl->next());
-         _file = _path;
+         m_path.setFileName(m_impl->next());
+         m_file = m_path;
       }
       return *this;
    }
-   
-   
-} // namespace Poco
+} // namespace nanogear
