@@ -27,11 +27,11 @@
 namespace nanogear
 {
 
-Path::Path() : _absolute(false)
+Path::Path() : m_absolute(false)
 {
 }
 
-Path::Path(bool absolute): _absolute(absolute)
+Path::Path(bool absolute): m_absolute(absolute)
 {
 }
 
@@ -58,46 +58,46 @@ Path::Path(const char* path, Style style)
 }
 
 Path::Path(const Path& path): 
-	_node(path._node), 
-	_device(path._device),
-	_name(path._name),
-	_version(path._version),
-	_dirs(path._dirs),
-	_absolute(path._absolute)
+	m_node(path.m_node),
+	m_device(path.m_device),
+	m_name(path.m_name),
+	m_version(path.m_version),
+	m_dirs(path.m_dirs),
+	m_absolute(path.m_absolute)
 {	
 }
 
 Path::Path(const Path& parent, const std::string& fileName):
-	_node(parent._node), 
-	_device(parent._device),
-	_name(parent._name),
-	_version(parent._version),
-	_dirs(parent._dirs),
-	_absolute(parent._absolute)
+	m_node(parent.m_node), 
+	m_device(parent.m_device),
+	m_name(parent.m_name),
+	m_version(parent.m_version),
+	m_dirs(parent.m_dirs),
+	m_absolute(parent.m_absolute)
 {	
 	makeDirectory();
-	_name = fileName;
+	m_name = fileName;
 }
 
 Path::Path(const Path& parent, const char* fileName):
-	_node(parent._node), 
-	_device(parent._device),
-	_name(parent._name),
-	_version(parent._version),
-	_dirs(parent._dirs),
-	_absolute(parent._absolute)
+	m_node(parent.m_node), 
+	m_device(parent.m_device),
+	m_name(parent.m_name),
+	m_version(parent.m_version),
+	m_dirs(parent.m_dirs),
+	m_absolute(parent.m_absolute)
 {	
 	makeDirectory();
-	_name = fileName;
+	m_name = fileName;
 }
 
 Path::Path(const Path& parent, const Path& relative):
-	_node(parent._node), 
-	_device(parent._device),
-	_name(parent._name),
-	_version(parent._version),
-	_dirs(parent._dirs),
-	_absolute(parent._absolute)
+	m_node(parent.m_node), 
+	m_device(parent.m_device),
+	m_name(parent.m_name),
+	m_version(parent.m_version),
+	m_dirs(parent.m_dirs),
+	m_absolute(parent.m_absolute)
 {	
 	resolve(relative);
 }
@@ -124,24 +124,24 @@ Path& Path::operator = (const char* path)
 
 void Path::swap(Path& path)
 {
-	std::swap(_node, path._node);
-	std::swap(_device, path._device);
-	std::swap(_name, path._name);
-	std::swap(_version, path._version);
-	std::swap(_dirs, path._dirs);
-	std::swap(_absolute, path._absolute);
+	std::swap(m_node, path.m_node);
+	std::swap(m_device, path.m_device);
+	std::swap(m_name, path.m_name);
+	std::swap(m_version, path.m_version);
+	std::swap(m_dirs, path.m_dirs);
+	std::swap(m_absolute, path.m_absolute);
 }
 
 Path& Path::assign(const Path& path)
 {
 	if (&path != this)
 	{
-		_node     = path._node;
-		_device   = path._device;
-		_name     = path._name;
-		_version  = path._version;
-		_dirs     = path._dirs;
-		_absolute = path._absolute;
+		m_node     = path.m_node;
+		m_device   = path.m_device;
+		m_name     = path.m_name;
+		m_version  = path.m_version;
+		m_dirs     = path.m_dirs;
+		m_absolute = path.m_absolute;
 	}
 	return *this;
 }
@@ -268,19 +268,19 @@ Path& Path::makeDirectory()
 #if defined(POCO_OS_FAMILY_VMS)
 	pushDirectory(getBaseName());
 #else
-	pushDirectory(_name);
+	pushDirectory(m_name);
 #endif
-	_name.clear();
-	_version.clear();
+	m_name.clear();
+	m_version.clear();
 	return *this;
 }
 
 Path& Path::makeFile()
 {
-	if (!_dirs.empty() && _name.empty())
+	if (!m_dirs.empty() && m_name.empty())
 	{
-		_name = _dirs.back();
-		_dirs.pop_back();
+		m_name = m_dirs.back();
+		m_dirs.pop_back();
 #if defined(POCO_OS_FAMILY_VMS)
 		setExtension("DIR");
 #endif
@@ -295,18 +295,18 @@ Path& Path::makeAbsolute()
 
 Path& Path::makeAbsolute(const Path& base)
 {
-	if (!_absolute)
+	if (!m_absolute)
 	{
 		Path tmp = base;
 		tmp.makeDirectory();
-		for (StringVec::const_iterator it = _dirs.begin(); it != _dirs.end(); ++it)
+		for (StringVec::const_iterator it = m_dirs.begin(); it != m_dirs.end(); ++it)
 		{
 			tmp.pushDirectory(*it);
 		}
-		_node     = tmp._node;
-		_device   = tmp._device;
-		_dirs     = tmp._dirs;
-		_absolute = base._absolute;
+		m_node     = tmp.m_node;
+		m_device   = tmp.m_device;
+		m_dirs     = tmp.m_dirs;
+		m_absolute = base.m_absolute;
 	}
 	return *this;
 }
@@ -314,7 +314,7 @@ Path& Path::makeAbsolute(const Path& base)
 Path Path::absolute() const
 {
 	Path result(*this);
-	if (!result._absolute)
+	if (!result.m_absolute)
 	{
 		result.makeAbsolute();
 	}
@@ -324,7 +324,7 @@ Path Path::absolute() const
 Path Path::absolute(const Path& base) const
 {
 	Path result(*this);
-	if (!result._absolute)
+	if (!result.m_absolute)
 	{
 		result.makeAbsolute(base);
 	}
@@ -339,25 +339,25 @@ Path Path::parent() const
 
 Path& Path::makeParent()
 {
-	if (_name.empty())
+	if (m_name.empty())
 	{
-		if (_dirs.empty())
+		if (m_dirs.empty())
 		{
-			if (!_absolute)
-				_dirs.push_back("..");
+			if (!m_absolute)
+				m_dirs.push_back("..");
 		}
 		else
 		{
-			if (_dirs.back() == "..")
-				_dirs.push_back("..");
+			if (m_dirs.back() == "..")
+				m_dirs.push_back("..");
 			else
-				_dirs.pop_back();
+				m_dirs.pop_back();
 		}
 	}
 	else
 	{
-		_name.clear();
-		_version.clear();
+		m_name.clear();
+		m_version.clear();
 	}
 	return *this;
 }
@@ -365,9 +365,9 @@ Path& Path::makeParent()
 Path& Path::append(const Path& path)
 {
 	makeDirectory();
-	_dirs.insert(_dirs.end(), path._dirs.begin(), path._dirs.end());
-	_name = path._name;
-	_version = path._version;
+	m_dirs.insert(m_dirs.end(), path.m_dirs.begin(), path.m_dirs.end());
+	m_name = path.m_name;
+	m_version = path.m_version;
 	return *this;
 }
 
@@ -381,43 +381,43 @@ Path& Path::resolve(const Path& path)
 	{
 		for (int i = 0; i < path.depth(); ++i)
 			pushDirectory(path[i]);
-		_name = path._name;
+		m_name = path.m_name;
 	}
 	return *this;
 }
 
 Path& Path::setNode(const std::string& node)
 {
-	_node     = node;
-	_absolute = _absolute || !node.empty();
+	m_node     = node;
+	m_absolute = m_absolute || !node.empty();
 	return *this;
 }
 	
 Path& Path::setDevice(const std::string& device)
 {
-	_device   = device;
-	_absolute = _absolute || !device.empty();
+	m_device   = device;
+	m_absolute = m_absolute || !device.empty();
 	return *this;
 }
 
 const std::string& Path::directory(int n) const
 {
-	//poco_assert (0 <= n && n <= _dirs.size());
+	//poco_assert (0 <= n && n <= m_dirs.size());
 	
-	if (n < _dirs.size())
-		return _dirs[n];
+	if (n < m_dirs.size())
+		return m_dirs[n];
 	else
-		return _name;	
+		return m_name;	
 }
 
 const std::string& Path::operator [] (int n) const
 {
-	//poco_assert (0 <= n && n <= _dirs.size());
+	//poco_assert (0 <= n && n <= m_dirs.size());
 	
-	if (n < _dirs.size())
-		return _dirs[n];
+	if (n < m_dirs.size())
+		return m_dirs[n];
 	else
-		return _name;	
+		return m_name;	
 }
 
 Path& Path::pushDirectory(const std::string& dir)
@@ -427,21 +427,21 @@ Path& Path::pushDirectory(const std::string& dir)
 #if defined(POCO_OS_FAMILY_VMS)
 		if (dir == ".." || dir == "-")
 		{
-			if (!_dirs.empty() && _dirs.back() != ".." && _dirs.back() != "-")
-				_dirs.pop_back();
-			else if (!_absolute)
-				_dirs.push_back(dir);
+			if (!m_dirs.empty() && m_dirs.back() != ".." && m_dirs.back() != "-")
+				m_dirs.pop_back();
+			else if (!m_absolute)
+				m_dirs.push_back(dir);
 		}
-		else _dirs.push_back(dir);
+		else m_dirs.push_back(dir);
 #else
 		if (dir == "..")
 		{
-			if (!_dirs.empty() && _dirs.back() != "..")
-				_dirs.pop_back();
-			else if (!_absolute)
-				_dirs.push_back(dir);
+			if (!m_dirs.empty() && m_dirs.back() != "..")
+				m_dirs.pop_back();
+			else if (!m_absolute)
+				m_dirs.push_back(dir);
 		}
-		else _dirs.push_back(dir);
+		else m_dirs.push_back(dir);
 #endif
 	}
 	return *this;
@@ -449,76 +449,76 @@ Path& Path::pushDirectory(const std::string& dir)
 
 Path& Path::popDirectory()
 {
-	//poco_assert (!_dirs.empty());
+	//poco_assert (!m_dirs.empty());
 	
-	_dirs.pop_back();
+	m_dirs.pop_back();
 	return *this;
 }
 
 Path& Path::popFrontDirectory()
 {
-	//poco_assert (!_dirs.empty());
+	//poco_assert (!m_dirs.empty());
 	
-	StringVec::iterator it = _dirs.begin();
-	_dirs.erase(it);
+	StringVec::iterator it = m_dirs.begin();
+	m_dirs.erase(it);
 	return *this;
 }
 	
 Path& Path::setFileName(const std::string& name)
 {
-	_name = name;
+	m_name = name;
 	return *this;
 }
 
 Path& Path::setBaseName(const std::string& name)
 {
 	std::string ext = getExtension();
-	_name = name;
+	m_name = name;
 	if (!ext.empty())
 	{
-		_name.append(".");
-		_name.append(ext);
+		m_name.append(".");
+		m_name.append(ext);
 	}
 	return *this;
 }
 
 std::string Path::getBaseName() const
 {
-	std::string::size_type pos = _name.rfind('.');
+	std::string::size_type pos = m_name.rfind('.');
 	if (pos != std::string::npos)
-		return _name.substr(0, pos);
+		return m_name.substr(0, pos);
 	else
-		return _name;
+		return m_name;
 }
 
 Path& Path::setExtension(const std::string& extension)
 {
-	_name = getBaseName();
+	m_name = getBaseName();
 	if (!extension.empty())
 	{
-		_name.append(".");
-		_name.append(extension);
+		m_name.append(".");
+		m_name.append(extension);
 	}
 	return *this;
 }
 
 std::string Path::getExtension() const
 {
-	std::string::size_type pos = _name.rfind('.');
+	std::string::size_type pos = m_name.rfind('.');
 	if (pos != std::string::npos)
-		return _name.substr(pos + 1);
+		return m_name.substr(pos + 1);
 	else
 		return std::string();
 }
 
 Path& Path::clear()
 {
-	_node.clear();
-	_device.clear();
-	_name.clear();
-	_dirs.clear();
-	_version.clear();
-	_absolute = false;
+	m_node.clear();
+	m_device.clear();
+	m_name.clear();
+	m_dirs.clear();
+	m_version.clear();
+	m_absolute = false;
 	return *this;
 }
 
@@ -596,7 +596,7 @@ void Path::parseUnix(const std::string& path)
 	{
 		if (*it == '/') 
 		{
-			_absolute = true; ++it;
+			m_absolute = true; ++it;
 		}
 		else if (*it == '~')
 		{
@@ -604,8 +604,8 @@ void Path::parseUnix(const std::string& path)
 			if (it == end || *it == '/')
 			{
 				Path cwd(home());
-				_dirs = cwd._dirs;
-				_absolute = true;
+				m_dirs = cwd.m_dirs;
+				m_absolute = true;
 			}
 			else --it;
 		}
@@ -616,12 +616,12 @@ void Path::parseUnix(const std::string& path)
 			while (it != end && *it != '/') name += *it++;
 			if (it != end)
 			{
-				if (_dirs.empty())
+				if (m_dirs.empty())
 				{
 					if (!name.empty() && *(name.rbegin()) == ':')
 					{
-						_absolute = true;
-						_device.assign(name, 0, name.length() - 1);
+						m_absolute = true;
+						m_device.assign(name, 0, name.length() - 1);
 					}
 					else
 					{
@@ -630,7 +630,7 @@ void Path::parseUnix(const std::string& path)
 				}
 				else pushDirectory(name);
 			}
-			else _name = name;
+			else m_name = name;
 			if (it != end) ++it;
 		}
 	}
@@ -645,11 +645,11 @@ void Path::parseWindows(const std::string& path)
 
 	if (it != end)
 	{
-		if (*it == '\\' || *it == '/') { _absolute = true; ++it; }
-		if (_absolute && it != end && (*it == '\\' || *it == '/')) // UNC
+		if (*it == '\\' || *it == '/') { m_absolute = true; ++it; }
+		if (m_absolute && it != end && (*it == '\\' || *it == '/')) // UNC
 		{
 			++it;
-			while (it != end && *it != '\\' && *it != '/') _node += *it++;
+			while (it != end && *it != '\\' && *it != '/') m_node += *it++;
 			if (it != end) ++it;
 		}
 		else if (it != end)
@@ -657,9 +657,9 @@ void Path::parseWindows(const std::string& path)
 			char d = *it++;
 			if (it != end && *it == ':') // drive letter
 			{
-				//if (_absolute || !((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) throw PathSyntaxException(path);
-				_absolute = true;
-				_device += d;
+				//if (m_absolute || !((d >= 'a' && d <= 'z') || (d >= 'A' && d <= 'Z'))) throw PathSyntaxException(path);
+				m_absolute = true;
+				m_device += d;
 				++it;
 				//if (it == end || (*it != '\\' && *it != '/')) throw PathSyntaxException(path);
 				++it;
@@ -673,11 +673,11 @@ void Path::parseWindows(const std::string& path)
 			if (it != end)
 				pushDirectory(name);
 			else
-				_name = name;
+				m_name = name;
 			if (it != end) ++it;
 		}
 	}
-	if (!_node.empty() && _dirs.empty() && !_name.empty())
+	if (!m_node.empty() && m_dirs.empty() && !m_name.empty())
 		makeDirectory();
 }
 
@@ -699,24 +699,24 @@ void Path::parseVMS(const std::string& path)
 				++it;
 				if (it != end && *it == ':')
 				{
-					_node = name;
+					m_node = name;
 					++it;
 				}
-				else _device = name;
-				_absolute = true;
+				else m_device = name;
+				m_absolute = true;
 				name.clear();
 			}
 			if (it != end)
 			{
-				if (_device.empty() && *it != '[')
+				if (m_device.empty() && *it != '[')
 				{
 					while (it != end && *it != ':' && *it != ';') name += *it++;
 					if (it != end)
 					{
 						if (*it == ':')
 						{
-							_device = name;
-							_absolute = true;
+							m_device = name;
+							m_absolute = true;
 							name.clear();
 							++it;
 						}
@@ -730,11 +730,11 @@ void Path::parseVMS(const std::string& path)
 					++it;
 					if (it != end)
 					{
-						_absolute = true;
+						m_absolute = true;
 						if (*it == '.')
-							{ _absolute = false; ++it; }
+							{ m_absolute = false; ++it; }
 						else if (*it == ']' || *it == '-')
-							_absolute = false;
+							m_absolute = false;
 						while (it != end && *it != ']')
 						{
 							name.clear();
@@ -746,12 +746,12 @@ void Path::parseVMS(const std::string& path)
 							{
 								if (name == "-")
 								{
-									if (_dirs.empty() || _dirs.back() == "..")
-										_dirs.push_back("..");
+									if (m_dirs.empty() || m_dirs.back() == "..")
+										m_dirs.push_back("..");
 									else 
-										_dirs.pop_back();
+										m_dirs.pop_back();
 								}
-								else _dirs.push_back(name);
+								else m_dirs.push_back(name);
 							}
 							if (it != end && *it != ']') ++it;
 						}
@@ -759,10 +759,10 @@ void Path::parseVMS(const std::string& path)
 						++it;
 						if (it != end && *it == '[')
 						{
-							//if (!_absolute) throw PathSyntaxException(path);
+							//if (!m_absolute) throw PathSyntaxException(path);
 							++it;
 							//if (it != end && *it == '.') throw PathSyntaxException(path);
-							int d = int(_dirs.size());
+							int d = int(m_dirs.size());
 							while (it != end && *it != ']')
 							{
 								name.clear();
@@ -774,10 +774,10 @@ void Path::parseVMS(const std::string& path)
 								{
 									if (name == "-")
 									{
-										if (_dirs.size() > d)
-											_dirs.pop_back();
+										if (m_dirs.size() > d)
+											m_dirs.pop_back();
 									}
-									else _dirs.push_back(name);
+									else m_dirs.push_back(name);
 								}
 								if (it != end && *it != ']') ++it;
 							}
@@ -785,18 +785,18 @@ void Path::parseVMS(const std::string& path)
 							++it;
 						}
 					}
-					_name.clear();
+					m_name.clear();
 				}
-				while (it != end && *it != ';') _name += *it++;
+				while (it != end && *it != ';') m_name += *it++;
 			}
-			else _name = name;
+			else m_name = name;
 			if (it != end && *it == ';')
 			{
 				++it;
-				while (it != end) _version += *it++;
+				while (it != end) m_version += *it++;
 			}
 		}
-		else _name = name;
+		else m_name = name;
 	}
 }
 
@@ -857,73 +857,73 @@ void Path::parseGuess(const std::string& path)
 std::string Path::buildUnix() const
 {
 	std::string result;
-	if (!_device.empty())
+	if (!m_device.empty())
 	{
 		result.append("/");
-		result.append(_device);
+		result.append(m_device);
 		result.append(":/");
 	}
-	else if (_absolute)
+	else if (m_absolute)
 	{
 		result.append("/");
 	}
-	for (StringVec::const_iterator it = _dirs.begin(); it != _dirs.end(); ++it)
+	for (StringVec::const_iterator it = m_dirs.begin(); it != m_dirs.end(); ++it)
 	{
 		result.append(*it);
 		result.append("/");
 	}
-	result.append(_name);
+	result.append(m_name);
 	return result;
 }
 
 std::string Path::buildWindows() const
 {
 	std::string result;
-	if (!_node.empty())
+	if (!m_node.empty())
 	{
 		result.append("\\\\");
-		result.append(_node);
+		result.append(m_node);
 		result.append("\\");
 	}
-	else if (!_device.empty())
+	else if (!m_device.empty())
 	{
-		result.append(_device);
+		result.append(m_device);
 		result.append(":\\");
 	}
-	else if (_absolute)
+	else if (m_absolute)
 	{
 		result.append("\\");
 	}
-	for (StringVec::const_iterator it = _dirs.begin(); it != _dirs.end(); ++it)
+	for (StringVec::const_iterator it = m_dirs.begin(); it != m_dirs.end(); ++it)
 	{
 		result.append(*it);
 		result.append("\\");
 	}
-	result.append(_name);
+	result.append(m_name);
 	return result;
 }
 
 std::string Path::buildVMS() const
 {
 	std::string result;
-	if (!_node.empty())
+	if (!m_node.empty())
 	{
-		result.append(_node);
+		result.append(m_node);
 		result.append("::");
 	}
-	if (!_device.empty())
+	if (!m_device.empty())
 	{
-		result.append(_device);
+		result.append(m_device);
 		result.append(":");
 	}
-	if (!_dirs.empty())
+	if (!m_dirs.empty())
 	{
 		result.append("[");
-		if (!_absolute && _dirs[0] != "..")
+		if (!m_absolute && m_dirs[0] != "..")
 			result.append(".");
-		for (StringVec::const_iterator it = _dirs.begin(); it != _dirs.end(); ++it)
+		for (StringVec::const_iterator it = m_dirs.begin(); it != m_dirs.end(); ++it)
 		{
-			if (it != _dirs.begin() && *it != "..")
+			if (it != m_dirs.begin() && *it != "..")
 				result.append(".");
 			if (*it == "..")
 				result.append("-");
@@ -932,11 +932,11 @@ std::string Path::buildVMS() const
 		}
 		result.append("]");
 	}
-	result.append(_name);
-	if (!_version.empty())
+	result.append(m_name);
+	if (!m_version.empty())
 	{
 		result.append(";");
-		result.append(_version);
+		result.append(m_version);
 	}
 	return result;
 }

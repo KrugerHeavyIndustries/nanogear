@@ -35,7 +35,7 @@
 
 namespace nanogear
 {
-   
+
 using std::string;
 
 DirectorySeparator::operator char() const

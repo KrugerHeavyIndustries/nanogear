@@ -345,12 +345,12 @@ protected:
 	std::string buildVMS() const;
 
 private:
-	std::string _node;
-	std::string _device;
-	std::string _name;
-	std::string _version;
-	StringVec   _dirs;
-	bool        _absolute;
+	std::string m_node;
+	std::string m_device;
+	std::string m_name;
+	std::string m_version;
+	StringVec   m_dirs;
+	bool        m_absolute;
 };
 
 
@@ -359,25 +359,25 @@ private:
 //
 inline bool Path::isAbsolute() const
 {
-	return _absolute;
+	return m_absolute;
 }
 
 	
 inline bool Path::isRelative() const
 {
-	return !_absolute;
+	return !m_absolute;
 }
 
 
 inline bool Path::isDirectory() const
 {
-	return _name.empty();
+	return m_name.empty();
 }
 
 
 inline bool Path::isFile() const
 {
-	return !_name.empty();
+	return !m_name.empty();
 }
 
 
@@ -395,31 +395,31 @@ inline Path& Path::parse(const std::string& path, Style style)
 
 inline const std::string& Path::getNode() const
 {
-	return _node;
+	return m_node;
 }
 
 
 inline const std::string& Path::getDevice() const
 {
-	return _device;
+	return m_device;
 }
 
 
 inline const std::string& Path::getFileName() const
 {
-	return _name;
+	return m_name;
 }
 
 
 inline int Path::depth() const
 {
-	return int(_dirs.size());
+	return int(m_dirs.size());
 }
 
 
 inline const std::string& Path::version() const
 {
-	return _version;
+	return m_version;
 }
 
 
