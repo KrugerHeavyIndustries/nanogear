@@ -23,7 +23,6 @@
 
 namespace nanogear
 {
-   
    class Timespan
    /// A class that represents time spans up to microsecond resolution.
    {
@@ -136,8 +135,7 @@ namespace nanogear
    private:
       TimeDiff _span;
    };
-   
-   
+
    //
    // inlines
    //
@@ -146,43 +144,36 @@ namespace nanogear
       return int(_span/DAYS);
    }
    
-   
    inline int Timespan::hours() const
    {
       return int((_span/HOURS) % 24);
    }
-   
-   
+
    inline int Timespan::totalHours() const
    {
       return int(_span/HOURS);
    }
-   
-   
+
    inline int Timespan::minutes() const
    {
       return int((_span/MINUTES) % 60);
    }
    
-   
    inline int Timespan::totalMinutes() const
    {
       return int(_span/MINUTES);
    }
-   
-   
+
    inline int Timespan::seconds() const
    {
       return int((_span/SECONDS) % 60);
    }
-   
-   
+
    inline int Timespan::totalSeconds() const
    {
       return int(_span/SECONDS);
    }
-   
-   
+
    inline int Timespan::milliseconds() const
    {
       return int((_span/MILLISECONDS) % 1000);
@@ -193,103 +184,86 @@ namespace nanogear
    {
       return _span/MILLISECONDS;
    }
-   
-   
+
    inline int Timespan::microseconds() const
    {
       return int(_span % 1000);
    }
-   
-   
+
    inline int Timespan::useconds() const
    {
       return int(_span % 1000000);
    }
    
-   
    inline Timespan::TimeDiff Timespan::totalMicroseconds() const
    {
       return _span;
    }
-   
-   
+
    inline bool Timespan::operator == (const Timespan& ts) const
    {
       return _span == ts._span;
    }
-   
-   
+
    inline bool Timespan::operator != (const Timespan& ts) const
    {
       return _span != ts._span;
    }
    
-   
    inline bool Timespan::operator >  (const Timespan& ts) const
    {
       return _span > ts._span;
    }
-   
-   
+
    inline bool Timespan::operator >= (const Timespan& ts) const
    {
       return _span >= ts._span;
    }
-   
-   
+
    inline bool Timespan::operator <  (const Timespan& ts) const
    {
       return _span < ts._span;
    }
    
-   
    inline bool Timespan::operator <= (const Timespan& ts) const
    {
       return _span <= ts._span;
    }
-   
-   
+
    inline bool Timespan::operator == (TimeDiff microSeconds) const
    {
       return _span == microSeconds;
    }
-   
-   
+
    inline bool Timespan::operator != (TimeDiff microSeconds) const
    {
       return _span != microSeconds;
    }
    
-   
    inline bool Timespan::operator >  (TimeDiff microSeconds) const
    {
       return _span > microSeconds;
    }
-   
-   
+
    inline bool Timespan::operator >= (TimeDiff microSeconds) const
    {
       return _span >= microSeconds;
    }
-   
-   
+
    inline bool Timespan::operator <  (TimeDiff microSeconds) const
    {
       return _span < microSeconds;
    }
-   
-   
+
    inline bool Timespan::operator <= (TimeDiff microSeconds) const
    {
       return _span <= microSeconds;
    }
    
-   
    inline void swap(Timespan& s1, Timespan& s2)
    {
       s1.swap(s2);
    }
-   
    
 } // namespace nanogear
 

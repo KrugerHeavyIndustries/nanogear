@@ -32,12 +32,16 @@
 #include "bytearray.h"
 #include "file.h"
 #include "path.h"
+#include "datetimeformatter.h"
+#include "datetimeformat.h" 
 
 using nanogear::ByteArray;
 using nanogear::File;
 using nanogear::Path;
 
 using std::string;
+using nanogear::DateTimeFormat;
+using nanogear::DateTimeFormatter;
 
 NDirectoryResource::NDirectoryResource(const string& root)
 :  m_root(root),
@@ -70,7 +74,6 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
                 for (; dirFile != files.end(); ++dirFile) {
                    string fileType("File");
                    string dirIdentifier("");
-                   //string size(QString::number(dirFile.size()).toStdString());
                    string size;
                    
                    if (dirFile->isDirectory()) {
@@ -85,8 +88,8 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
                    
                    htmlTableEntries <<	"<tr>"
                    "<td class=\"n\"><a href=\"" << arg1 << "\">" << arg2 << "</a>" << arg3 << "</td>" <<
-                   "<td class=\"m\">" << dirFile->getLastModified().epochTime() << "</td>" <<
-                   "<td class=\"s\">" << size << "</td>" <<
+                   "<td class=\"m\">" << DateTimeFormatter::format(dirFile->getLastModified(), DateTimeFormat::ISO8601_FORMAT) << "</td>" <<
+                   "<td class=\"s\">" << dirFile->getSize() << "</td>" <<
                    "<td class=\"t\">" << fileType << "</td>"
                    "</tr>\n";
 
