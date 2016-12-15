@@ -25,6 +25,7 @@
 #include "bytearray.h"
 
 #include <iconv.h>
+#include <errno.h>
 #include <iterator>
 
 #define OUTBUFLEN 4096
@@ -57,8 +58,19 @@ void NRepresentation::setXhtml(const string& xhtml)
     iconv_t cd = iconv_open("UTF-8", "ASCII");
    
     if (iconv(cd, &inptr, &inbytesleft, &outptr, &outbytesleft) == -1)
-       throw logic_error("failed to convert using iconv");
-          
+    {
+        switch (errno) {
+            case EILSEQ:
+                throw logic_error("An invalid multibyte sequence was encountered in the input.");
+            case EINVAL:
+                throw logic_error("An incomplete multibyte sequence was encountered in the input.");
+            case E2BIG:
+                throw logic_error("The output buffer has no more room for the next converted character.");
+            default:
+                throw logic_error("An unknown error occured.");
+        }
+    }
+
     setData("application/xhtml+xml", ByteArray(outbuf, outbuf + (OUTBUFLEN - outbytesleft)));
    
     iconv_close(cd);

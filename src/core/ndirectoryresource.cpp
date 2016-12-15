@@ -66,7 +66,7 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
             } else if (m_indexAllowed) {
                 // Return an HTML representation of this directory
 
-				    std::ostringstream htmlTableEntries;
+                std::ostringstream htmlTableEntries;
                 std::vector<File> files;
                 pathInfo.list(files);
                
@@ -87,7 +87,7 @@ void NDirectoryResource::handleGet(const NRequest& request, NResponse& response)
                    string arg3 = dirIdentifier;
                    
                    htmlTableEntries <<	"<tr>"
-                   "<td class=\"n\"><a href=\"" << arg1 << "\">" << arg2 << "</a>" << arg3 << "</td>" <<
+                   "<td class=\"n\"><a href=\"" << "arg1" << "\">" << "arg2" << "</a>" << "arg3" << "</td>" <<
                    "<td class=\"m\">" << DateTimeFormatter::format(dirFile->getLastModified(), DateTimeFormat::ISO8601_FORMAT) << "</td>" <<
                    "<td class=\"s\">" << dirFile->getSize() << "</td>" <<
                    "<td class=\"t\">" << fileType << "</td>"

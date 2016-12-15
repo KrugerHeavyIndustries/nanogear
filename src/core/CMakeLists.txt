@@ -1,4 +1,14 @@
 set(nanogear_SRCS
+    datetime.cpp
+    datetimeformat.cpp
+    datetimeformatter.cpp
+    numberformatter.cpp
+    path.cpp
+    file.cpp
+    timestamp.cpp
+    stringtokenizer.cpp
+    timespan.cpp
+    directoryiterator.cpp
     ndirectoryresource.cpp
     nmethod.cpp
     nprotocol.cpp
@@ -7,7 +17,7 @@ set(nanogear_SRCS
     nrouter.cpp
     nstatus.cpp
     nmimetype.cpp
-		napplication.cpp
+    napplication.cpp
 )
 
 add_library(Nanogear SHARED ${nanogear_SRCS})
@@ -16,6 +26,8 @@ set_target_properties(Nanogear PROPERTIES
     VERSION ${NANOGEAR_MAJOR}.${NANOGEAR_MINOR}.${NANOGEAR_PATCH}
     SOVERSION ${NANOGEAR_MAJOR}
 )
+
+include_directories(Nanogear ${Libmagic_INCLUDE_DIR})
 
 target_link_libraries(Nanogear ${Libmagic_LIBRARY} ${QT_LIBRARIES} ${ICONV_LIBRARY})
 
