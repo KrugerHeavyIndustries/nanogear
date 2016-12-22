@@ -16,76 +16,79 @@
 #include <napplication.h>
 #include <bytearray.h>
 
+#include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <iterator>
 #include <functional>
 
 using namespace std;
 
+namespace std {
+    ostream& operator <<(ostream& os, const pair<string, string>& pair) {
+        return os << pair.first << ": " << pair.second << "\r\n";
+    }
+}
+
 namespace nanogear
 {
-   #define MAX_PORT_SIZE 8
-   #define SERVER_POLL_MILLISECONDS 1000
-   #define unwrap() connection_cast(this)
+    #define MAX_PORT_SIZE 8
+    #define SERVER_POLL_MILLISECONDS 1000
+    
+    inline HttpRequestHeader::value_type request_header_map(mg_str& name, mg_str& value)
+    {
+        return HttpRequestHeader::value_type(name.p, value.p);
+    }
+
+    inline bool is_3xx_redirection(int code)
+    {
+        return 300 < code && code < 400;
+    }
    
-   inline mg_connection* connection_cast(const Connection* connection)
-   {
-      return (mg_connection*)(connection);
-   }
-   
-   inline HttpRequestHeader::value_type request_header_map(const mg_connection::mg_header& header)
-   {
-      return HttpRequestHeader::value_type(header.name, header.value);
-   }
-   
-   struct send_header_t
-   {
-      send_header_t(const Connection* connection)
-         :  m_connection(connection)
-      {
-      }
-      
-      void operator()(const HttpResponseHeader::value_type& tuple)
-      {
-         m_connection->sendHeader(tuple.first, tuple.second);
-      }
-      
-      const Connection* m_connection;
-   };
-   
-   HTTPServer::HTTPServer(int port)
+    HTTPServer::HTTPServer(int port)
       :  NServer(port)
+    {
+    }
+
+    void HTTPServer::start()
+    {
+        const char *err_str;
+        char http_port[MAX_PORT_SIZE];
+        snprintf(http_port, MAX_PORT_SIZE, "%d", port());
+       
+        struct mg_mgr mgr;
+        struct mg_connection *nc;
+        struct mg_bind_opts bind_opts;
+       
+        mg_mgr_init(&mgr, NULL);
+       
+        memset(&bind_opts, 0, sizeof(bind_opts));
+        bind_opts.error_string = &err_str;
+       
+        nc = mg_bind_opt(&mgr, http_port, eventHandler, bind_opts);
+        mg_set_protocol_http_websocket(nc);
+        for (;;) {
+            mg_mgr_poll(&mgr, SERVER_POLL_MILLISECONDS);
+        }
+        mg_mgr_free(&mgr);
+    }
+
+   void HTTPServer::eventHandler(mg_connection* connection, int event, void* eventData)
    {
-   }
-   
-   void HTTPServer::start()
-   {
-      char port_result[MAX_PORT_SIZE];
-      struct mg_server* server = mg_create_server(NULL, eventHandler);
-      snprintf(port_result, MAX_PORT_SIZE, "%d", port());
-      mg_set_option(server, "listening_port", port_result);
-      for (;;) {
-         mg_poll_server(server, SERVER_POLL_MILLISECONDS);
+       http_message* message = (http_message*)eventData;
+       switch(event) {
+         case MG_EV_HTTP_REQUEST:
+               handleRequest(reinterpret_cast<Connection*>(connection), reinterpret_cast<HttpMessage*>(message));
+         default:
+               break;
       }
-      mg_destroy_server(&server);
    }
    
-   int HTTPServer::eventHandler(mg_connection* connection, mg_event event)
+   void HTTPServer::handleRequest(Connection* connection, HttpMessage* message)
    {
-      switch(event) {
-         case MG_AUTH:
-            return MG_TRUE;
-         case MG_REQUEST:
-            return handleRequest(reinterpret_cast<Connection*>(connection));
-         default: return MG_FALSE;
-      }
-   }
-   
-   int HTTPServer::handleRequest(Connection* connection)
-   {
-      HttpRequestHeader requestHeader = connection->getHttpRequestHeader();
-   
-      NRepresentation entity(connection->getContent(), requestHeader["Content-Type"]);
+      HttpRequestHeader requestHeader = message->getHttpRequestHeader();
+
+      NRepresentation entity(message->getContent(), requestHeader["Content-Type"]);
       
       NPreferenceList<NMimeType> acceptedMimeTypes(getPreferenceListFromHeader<NMimeType>(requestHeader["Accept"]));
       NPreferenceList<QLocale> acceptedLocales(getPreferenceListFromHeader<QLocale>(requestHeader["Accept-Language"]));
@@ -93,11 +96,10 @@ namespace nanogear
       
       NClientInfo clientInfo(acceptedMimeTypes, acceptedLocales, acceptedCharsets);
       
-      NRequest request(connection->getMethod(), clientInfo, &entity);
+      NRequest request(message->getMethod(), clientInfo, &entity);
       
-      request.setResourceRef(connection->getUri());
-      
-      request.setParameters(connection->getQueryParameters());
+      request.setResourceRef(message->getUri());
+      request.setParameters(message->getQueryParameters());
       
       NResponse response;
       
@@ -112,14 +114,18 @@ namespace nanogear
                                         requestHeader.getMajorVersion(),
                                         requestHeader.getMinorVersion());
       
-      responseHeader.insert(make_pair("Connection", requestHeader["Connection"]));
-      
-      if (responseHeader.count("Connection") == 0) {
-         if (responseHeader.getMajorVersion() <= 1 && responseHeader.getMinorVersion() == 0)
-            responseHeader.insert(make_pair("Connection", "close"));
+      //responseHeader.insert(make_pair("Connection", requestHeader["Connection"]));
+     
+      if (is_3xx_redirection(response.status().code())) {
+         responseHeader.insert(make_pair("Location", response.location()));
       }
+
+      //if (responseHeader.count("Connection") == 0) {
+      //   if (responseHeader.getMajorVersion() <= 1 && responseHeader.getMinorVersion() == 0)
+            //responseHeader.insert(make_pair("Connection", "close"));
+      //}
       
-      responseHeader.insert(make_pair("Server", "Nanogear"));
+      //responseHeader.insert(make_pair("Server", "Nanogear"));
       
       if (response.expirationDate().isValid()) {
          //responseHeader.insert(make_pair("Expires", responseHeader.getExpirationDate().toUTC());
@@ -134,107 +140,125 @@ namespace nanogear
          } else {
             responseHeader.setContentType(representation->format(clientInfo.acceptedMimeTypes()));
             responseData = representation->data(clientInfo.acceptedMimeTypes());
+          
          }
       }
-      
+       
+      responseHeader.setContentLength(responseData.size());
+       
       connection->sendHttpResponseHeader(responseHeader);
       connection->sendData(responseData);
-      
+       
+       //connection->close();
       delete resource;
-      
-      return MG_TRUE;
    }
    
-   string Connection::getUri() const
-   {
-      return unwrap()->uri;
-   }
-   
-   NMethod Connection::getMethod() const
-   {
-      return NMethod::valueOf(unwrap()->request_method);
-   }
-   
-   unordered_map<string, string> Connection::getQueryParameters() const
-   {
-      unordered_map<string, string> parameters;
-      size_t query_string_len = unwrap()->query_string ? strlen(unwrap()->query_string) : 0;
-      
-      const char* first = unwrap()->query_string;
-      const char* last = unwrap()->query_string + query_string_len;
-      
-      const char* key_start = first;
-      const char* key_end = NULL;
-      const char* value_start = NULL;
-      
-      for (; first != last; ++first) {
-         if (*first == '&') {
-            parameters.insert(make_pair(string(key_start, key_end), string(value_start, first)));
-            key_start = first + 1;
-         }
-         if (*first == '=') {
-            key_end = first;
-            value_start = first + 1;
-         }
-      }
-      if (first && key_start && key_end && value_start) {
-         parameters.insert(make_pair(string(key_start, key_end), string(value_start, first)));
-      }
-   
-      return parameters;
-   }
-   
-   char* Connection::getContent() const
-   {
-      return unwrap()->content;
-   }
-   
-   int Connection::getContentLength() const
-   {
-      return unwrap()->content_len;
-   }
-   
-   HttpRequestHeader Connection::getHttpRequestHeader() const
-   {
-      int majorVersion = 1;
-      int minorVersion = 1;
-      
-      if (strcmp(unwrap()->http_version, "1.0") == 0) {
-         majorVersion = 1;
-         minorVersion = 0;
-      } else if (strcmp(unwrap()->http_version, "1.1") == 0) {
-         majorVersion = 1;
-         minorVersion = 1;
-      }
+    http_message* HttpMessage::unwrap() const
+    {
+        return (http_message*)this;
+    }
+    
+    pair<string, string> HttpMessage::parseQueryPair(const string& keypair) const
+    {
+        size_t eq = keypair.find("=");
+        if (eq == std::string::npos)
+            throw "Failed to find '=' in key-value pair.";
+        return make_pair<string, string>(keypair.substr(0, eq), keypair.substr(eq + 1));
+    }
+    
+    unordered_map<string, string> HttpMessage::parseQueryParameters(const string& query) const
+    {
+        unordered_map<string, string> parameters;
+        if (query.empty()) {
+            return parameters;
+        }
+    
+        size_t last = 0;
+        bool more = true;
+        while (more)
+        {
+            size_t next = query.find('&', last + 1);
+            parameters.insert(parseQueryPair((next == string::npos) ? query.substr(last) : query.substr(last, next - last)));
+            last = next + 1;
+            if (next == string::npos)
+            {
+                more = false;
+            }
+        }
+        return parameters;
+    }
 
-      HttpRequestHeader httpRequestHeader(majorVersion, minorVersion);
+    string HttpMessage::getUri() const
+    {
+        return unwrap()->uri.len > 0 ? string(unwrap()->uri.p, unwrap()->uri.len) : "";
+    }
+   
+    NMethod HttpMessage::getMethod() const
+    {
+        return NMethod::valueOf(string(unwrap()->method.p, unwrap()->method.len));
+    }
+   
+    unordered_map<string, string> HttpMessage::getQueryParameters() const
+    {
+        for (int i = 0; unwrap()->header_names[i].len > 0; ++i)
+        {
+            if (strncmp(unwrap()->header_names[i].p, "Content-Type", 12) == 0 &&
+                strncmp(unwrap()->header_values[i].p, "application/x-www-form-urlencoded", 33) == 0)
+            {
+                return parseQueryParameters(string(unwrap()->body.p, unwrap()->body.len));
+            }
+        }
+        return parseQueryParameters(string(unwrap()->query_string.p, unwrap()->query_string.len));
+    }
+   
+    string HttpMessage::getContent() const
+    {
+        return string(unwrap()->body.p, unwrap()->body.len);
+    }
+   
+   int HttpMessage::getContentLength() const
+   {
+      return unwrap()->body.len;
+   }
+   
+    HttpRequestHeader HttpMessage::getHttpRequestHeader() const
+    {
+        int majorVersion = 1;
+        int minorVersion = 1;
+        if (strncmp(unwrap()->proto.p, "HTTP/1.0", 8) == 0) {
+           majorVersion = 1;
+           minorVersion = 0;
+        } else if (strncmp(unwrap()->proto.p, "HTTP/1.1", 8) == 0) {
+           majorVersion = 1;
+           minorVersion = 1;
+        }
+
+        HttpRequestHeader httpRequestHeader(majorVersion, minorVersion);
       
-      transform(unwrap()->http_headers,
-                unwrap()->http_headers + unwrap()->num_headers,
-                inserter(httpRequestHeader, httpRequestHeader.begin()),
-                request_header_map);
-      
-      return httpRequestHeader;
+        for (int i = 0; unwrap()->header_names[i].len > 0; i++) {
+            httpRequestHeader[string(unwrap()->header_names[i].p, unwrap()->header_names[i].len)] = string(unwrap()->header_values[i].p, unwrap()->header_values[i].len);
+        }
+        return httpRequestHeader;
    }
    
-   void Connection::sendStatus(int status)
+   void Connection::sendHttpResponseHeader(const HttpResponseHeader& header) const
    {
-      mg_send_status(unwrap(), status);
+       ostringstream result;
+       copy(header.begin(), header.end(), ostream_iterator<pair<string, string> >(result));
+       mg_send_response_line(unwrap(), header.getStatus(), result.str().c_str());
    }
    
-   void Connection::sendHeader(const std::string& name, const std::string& value) const
+   void Connection::sendData(const ByteArray& data) const
    {
-      mg_send_header(unwrap(), name.c_str(), value.c_str());
+      mg_send(unwrap(), data.data(), data.size());
    }
-   
-   void Connection::sendHttpResponseHeader(const HttpResponseHeader& header)
-   {
-      sendStatus(header.getStatus());
-      for_each(header.begin(), header.end(), send_header_t(this));
-   }
-   
-   void Connection::sendData(const ByteArray& data)
-   {
-      mg_send_data(unwrap(), data.data(), data.size());
-   }
+    
+    void Connection::close() const
+    {
+        unwrap()->flags = MG_F_CLOSE_IMMEDIATELY;
+    }
+    
+    mg_connection* Connection::unwrap() const {
+        return (mg_connection*)(this);
+    }
 }

@@ -24,6 +24,8 @@ public:
    HttpResponseHeader(int status, const std::string& text, int majorVersion, int minorVersion);
    
    void setContentType(const NMimeType& type);
+    
+   void setContentLength(int bytes);
    
    inline int getStatus() const { return m_status; }
    
@@ -34,7 +36,6 @@ public:
 private:
    
    const int m_status;
-   const std::string m_text;
    
    const int m_majorVersion;
    const int m_minorVersion;

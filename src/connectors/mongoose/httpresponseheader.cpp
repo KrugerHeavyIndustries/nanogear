@@ -15,7 +15,6 @@ namespace nanogear
    
    HttpResponseHeader::HttpResponseHeader(int status, const string& text, int majorVersion, int minorVersion) :
       m_status(status),
-      m_text(text),
       m_majorVersion(majorVersion),
       m_minorVersion(minorVersion)
    {
@@ -25,4 +24,9 @@ namespace nanogear
    {
       (*this)["Content-Type"] = type.toString();
    }
+    
+    void HttpResponseHeader::setContentLength(int bytes)
+    {
+        (*this)["Content-Length"] = std::to_string(bytes);
+    }
 }

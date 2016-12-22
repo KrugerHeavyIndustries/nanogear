@@ -61,6 +61,18 @@ public:
     const NStatus& status()
     { return m_status; }
 
+    /*! 
+     *
+     */
+    void setLocationRef(const std::string& locationRef) 
+    { m_locationRef = locationRef; } 
+
+    /*! 
+     * \return The location url 
+     */
+    const std::string& location() const 
+    { return m_locationRef; }
+
     /*!
      * Set the representation attached to this Response
      * \param representation A pointer to a Representation object
@@ -89,6 +101,7 @@ public:
 
 private:
     NStatus m_status;
+    std::string m_locationRef;
     const NRepresentation* m_representation;
     QDateTime m_expires;
 };
