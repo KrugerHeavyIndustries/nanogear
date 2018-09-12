@@ -23,7 +23,7 @@ After cloning the repository make a parallel build directory
 ```bash
 mkdir nanogear_build
 cd nanogear_build 
-cmake -G Xcode -DWITH_EXAMPLES=1 ../nanogear
+cmake -G Xcode -DWITH_EXAMPLES=1 ..
 open nanogear.xcodeproj
 ```
 
