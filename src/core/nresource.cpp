@@ -22,7 +22,6 @@
  */
 
 #include "nresource.h"
-
 #include "nmethod.h"
 #include "nstatus.h"
 #include "nrequest.h"

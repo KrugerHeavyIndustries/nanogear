@@ -24,8 +24,6 @@
 #ifndef NSERVER_H
 #define NSERVER_H
 
-#include <QHostAddress>
-
 #include "nresource.h"
 
 /*!
@@ -45,8 +43,7 @@ public:
      * \param port The server will listen on to this port
      * \param listenAddress The server will listen on this address
      */
-    NServer(int port = 8080, const QHostAddress& listenAddress = QHostAddress::Any) :
-            m_listenPort(port), m_listenAddress(listenAddress), m_target(0) {}
+    NServer(int port = 8080) : m_listenPort(port), m_target(0) {}
 
     /*!
      * Set the listen port for this server
@@ -65,14 +62,14 @@ public:
      * Set the address onto the server listens for new connections
      * \param listenAddress An IPv4/IPv6 address encapsulated in a QHostAddress
      */
-    void setAddress(const QHostAddress& listenAddress)
-    { m_listenAddress = listenAddress; }
+    //void setAddress(const QHostAddress& listenAddress)
+    //{ m_listenAddress = listenAddress; }
 
     /*!
      * \return The current listening address
      */
-    const QHostAddress& address() const
-    { return m_listenAddress; }
+    //const QHostAddress& address() const
+    //{ return m_listenAddress; }
 
     /*!
      * Set the target Resource
@@ -101,7 +98,6 @@ public:
 
 private:
     int m_listenPort;
-    QHostAddress m_listenAddress;
     NResource* m_target;
 };
 

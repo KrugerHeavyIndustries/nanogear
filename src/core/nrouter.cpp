@@ -36,7 +36,6 @@ NRouter::~NRouter()
     }
 }
 
-
 void NRouter::handleRequest(const NRequest& request, NResponse& response)
 {
     bool found = false;

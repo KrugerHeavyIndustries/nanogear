@@ -22,9 +22,11 @@
  */
 
 #ifndef NMETADATA_H
-#define	NMETADATA_H
+#define NMETADATA_H
 
 #include <string>
+
+#define N_UNUSED(x) (void)x;
 
 /*!
  * \class NMetadata

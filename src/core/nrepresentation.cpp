@@ -22,21 +22,30 @@
  */
 
 #include "nrepresentation.h"
+#include "bytearray.h"
 
 #include <iconv.h>
+#include <errno.h>
 #include <iterator>
 
 #define OUTBUFLEN 4096
 
+using nanogear::ByteArray;
+using std::string;
+using std::vector;
+using std::pair;
+using std::back_inserter;
+using std::logic_error;
+
 namespace
 {
-   std::string key_retrieval_func(const std::pair<std::string, std::vector<unsigned char> >& pair)
+   string key_retrieval_func(const pair<string, ByteArray>& pair)
    {
       return pair.first;
    }
 }
 
-void NRepresentation::setXhtml(const std::string& xhtml)
+void NRepresentation::setXhtml(const string& xhtml)
 {
     char outbuf[OUTBUFLEN];
    
@@ -49,13 +58,24 @@ void NRepresentation::setXhtml(const std::string& xhtml)
     iconv_t cd = iconv_open("UTF-8", "ASCII");
    
     if (iconv(cd, &inptr, &inbytesleft, &outptr, &outbytesleft) == -1)
-       throw std::logic_error("failed to convert using iconv");
-          
-    setData("application/xhtml+xml", std::vector<unsigned char>(outbuf, outbuf + (OUTBUFLEN - outbytesleft)));
+    {
+        switch (errno) {
+            case EILSEQ:
+                throw logic_error("An invalid multibyte sequence was encountered in the input.");
+            case EINVAL:
+                throw logic_error("An incomplete multibyte sequence was encountered in the input.");
+            case E2BIG:
+                throw logic_error("The output buffer has no more room for the next converted character.");
+            default:
+                throw logic_error("An unknown error occured.");
+        }
+    }
+
+    setData("application/xhtml+xml", ByteArray(outbuf, outbuf + (OUTBUFLEN - outbytesleft)));
    
     iconv_close(cd);
 
-    std::string html = xhtml;
+    string html = xhtml;
     //QRegExp fix;
 
 /*
@@ -167,15 +187,20 @@ void NRepresentation::setXhtml(const std::string& xhtml)
     setHtml(html);
 }
 
-void NRepresentation::setHtml(const std::string& html)
+void NRepresentation::setHtml(const string& html)
 {
-   setData("text/html", std::vector<unsigned char>(html.begin(), html.end()));
+   setData("text/html", ByteArray(html.begin(), html.end()));
+}
+
+void NRepresentation::setText(const string& text)
+{
+   setData("text/plain", ByteArray(text.begin(), text.end()));
 }
 
 std::vector<NMimeType> NRepresentation::formats() const
 {
-   std::vector<NMimeType> types;
-   std::transform(m_data.begin(), m_data.end(), std::back_inserter(types), key_retrieval_func);
+   vector<NMimeType> types;
+   transform(m_data.begin(), m_data.end(), back_inserter(types), key_retrieval_func);
    return types;
 }
 

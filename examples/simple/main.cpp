@@ -23,14 +23,16 @@
 #include <NRepresentation>
 #include <NStatus>
 #include <NRouter>
-#include <ihttp/NHTTPServer>
+#include <mongoose/mongoose_cpp.h>
+
+using namespace nanogear;
 
 class RootResource : public NResource {
 public:
     RootResource() : m_representation("<h1>Simple example</h1><br/><a href=\"/second\">Another resource</a>", "text/html") {}
 
     virtual void handleGet(const NRequest& request, NResponse& response) {
-        Q_UNUSED(request)
+        N_UNUSED(request)
         response.setStatus(NStatus::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
@@ -44,7 +46,7 @@ public:
     SecondResource() : m_representation("<h1>Another resource</h1>", "text/html") {}
 
     virtual void handleGet(const NRequest& request, NResponse& response) {
-        Q_UNUSED(request)
+        N_UNUSED(request)
         response.setStatus(NStatus::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
@@ -66,21 +68,11 @@ public:
         
         return router;
     }
-   
-    virtual bool notify(QObject* o, QEvent* e)
-    {
-       try {
-          return QCoreApplication::notify(o, e);
-       }
-       catch (std::exception& what) {
-          return true;
-       }
-    }
 };
 
 int main(int argc, char** argv) {
     SimpleApplication app(argc, argv);
-    app.setServer(new NHTTPServer());
+    app.setServer(HTTPServer_Create());
     return app.exec();
 }
 

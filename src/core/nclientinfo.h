@@ -24,10 +24,12 @@
 #ifndef NCLIENTINFO_H
 #define NCLIENTINFO_H
 
-#include <QLocale>
-
 #include "nmimetype.h"
 #include "npreferencelist.h"
+#include "nlocale.h"
+#include "ntextcodec.h"
+
+using std::string;
 
 class QTextCodec;
 
@@ -60,15 +62,15 @@ public:
      * \param userAgent the UserAgent string (if any)
      */
     NClientInfo(const NPreferenceList<NMimeType>& mimeTypes,
-                const NPreferenceList<QLocale>& locales,
-                const NPreferenceList<QTextCodec*>& codecs,
-                const QString& userAgent = QString()) : m_mimeTypes(mimeTypes),
+                const NPreferenceList<NLocale>& locales,
+                const NPreferenceList<NTextCodec*>& codecs,
+                const string& userAgent = string()) : m_mimeTypes(mimeTypes),
             m_locales(locales), m_codecs(codecs), m_userAgent(userAgent) {}
 
     /*!
      * \return The UserAgent string (if any)
      */
-    const QString& userAgent() const;
+    const string& userAgent() const;
 
     /*!
      * \return The list of accepted MIME types
@@ -79,20 +81,20 @@ public:
     /*!
      * \return The list of accepted MIME types
      */
-    const NPreferenceList<QLocale>& acceptedLocales() const
+    const NPreferenceList<NLocale>& acceptedLocales() const
     { return m_locales; }
 
     /*!
      * \return The list of accepted charsets
      */
-    const NPreferenceList<QTextCodec*>& acceptedTextCodecs() const
+    const NPreferenceList<NTextCodec*>& acceptedTextCodecs() const
     { return m_codecs; }
 
 private:
     NPreferenceList<NMimeType> m_mimeTypes;
-    NPreferenceList<QLocale> m_locales;
-    NPreferenceList<QTextCodec*> m_codecs;
-    QString m_userAgent;
+    NPreferenceList<NLocale> m_locales;
+    NPreferenceList<NTextCodec*> m_codecs;
+    string m_userAgent;
 };
 
 #endif /* NCLIENTINFO_H */

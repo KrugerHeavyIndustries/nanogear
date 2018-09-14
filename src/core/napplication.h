@@ -25,8 +25,6 @@
 #ifndef NAPPLICATION_H
 #define NAPPLICATION_H
 
-#include <QCoreApplication>
-
 #include "nserver.h"
 #include "nresponse.h"
 #include "nresource.h"
@@ -40,7 +38,7 @@
  * of dependant resources.
  * It is responsible for starting the event loop and the attached connector.
  */
-class NApplication : public QCoreApplication, public NResource
+class NApplication : public NResource
 {
 public:
     /*!
@@ -52,7 +50,7 @@ public:
      * Warning: The data pointed to by argc and argv must stay valid for the
      * entire lifetime of the QCoreApplication object.
      */
-    NApplication(int argc, char** argv) : QCoreApplication(argc, argv) {}
+   NApplication(int argc, char** argv) { ms_instance = this; }
 
     /*!
      * Attach a server to this application. The server is automatically started
@@ -86,7 +84,7 @@ public:
      * \return A pointer to the current instance
      */
     static NApplication* instance() {
-        return static_cast<NApplication*>(QCoreApplication::instance());
+       return ms_instance;
     }
 
     /*!
@@ -95,11 +93,14 @@ public:
      * \return The value set to exit() (which is 0 if you call quit())
      */
     int exec() {
-        m_server->start();
-        return QCoreApplication::exec();
+       m_server->start();
+       return 0;
     }
 
 private:
+   
+    static NApplication* ms_instance;
+   
     NServer* m_server;
 };
 
