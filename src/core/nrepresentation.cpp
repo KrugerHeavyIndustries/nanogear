@@ -192,6 +192,11 @@ void NRepresentation::setHtml(const string& html)
    setData("text/html", ByteArray(html.begin(), html.end()));
 }
 
+void NRepresentation::setText(const string& text)
+{
+   setData("text/plain", ByteArray(text.begin(), text.end()));
+}
+
 std::vector<NMimeType> NRepresentation::formats() const
 {
    vector<NMimeType> types;

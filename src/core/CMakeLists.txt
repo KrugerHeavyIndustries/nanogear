@@ -11,6 +11,7 @@ set(nanogear_SRCS
     directoryiterator.cpp
     ndirectoryresource.cpp
     nmethod.cpp
+    ntextcodec.cpp
     nprotocol.cpp
     nrepresentation.cpp
     nresource.cpp

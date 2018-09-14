@@ -14,7 +14,7 @@
 //
 
 
-#include "dateTime.h"
+#include "datetime.h"
 #include "timespan.h"
 #include <algorithm>
 #include <cmath>
@@ -24,8 +24,8 @@ namespace nanogear
 
    inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
    {
-      double utcDays = double(utcTime)/864000000000.0;
-      return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
+       double utcDays = double(utcTime)/864000000000.0;
+       return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
    }
 
    inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
@@ -33,12 +33,17 @@ namespace nanogear
       return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
    }
 
-   DateTime::DateTime()
+    DateTime::DateTime() :
+    _utcTime(0),
+    _year(0),
+    _month(0),
+    _day(0),
+    _hour(0),
+    _minute(0),
+    _second(0),
+    _millisecond(0),
+    _microsecond(0)
    {
-      Timestamp now;
-      _utcTime = now.utcTime();
-      computeGregorian(julianDay());
-      computeDaytime();
    }
 
    DateTime::DateTime(const Timestamp& timestamp):
@@ -207,10 +212,14 @@ namespace nanogear
          return daysOfMonthTable[month];
    }
 
-
+   DateTime DateTime::now()
+   {
+       return DateTime(Timestamp());
+   }
+    
    bool DateTime::isValid(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
    {
-      return
+       return
       (year >= 0 && year <= 9999) &&
       (month >= 1 && month <= 12) &&
       (day >= 1 && day <= daysOfMonth(year, month)) &&

@@ -10,11 +10,6 @@ option(WITH_EXAMPLES "WITH_EXAMPLES" OFF)
 find_package(Libmagic REQUIRED)
 find_package(Iconv REQUIRED)
 
-find_package(Qt4 REQUIRED)
-set(QT_USE_QTNETWORK 1)
-set(QT_DONT_USE_QTGUI 1)
-include(${QT_USE_FILE})
-
 #
 # Build documentation if doxygen and graphviz are found
 #

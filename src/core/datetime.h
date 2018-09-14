@@ -84,7 +84,7 @@ namespace nanogear
       };
 
       DateTime();
-      /// Creates a DateTime for the current date and time.
+      /// Creates an empty DateTime
 
       DateTime(const Timestamp& timestamp);
       /// Creates a DateTime for the date and time given in
@@ -179,6 +179,8 @@ namespace nanogear
 
       bool isPM() const;
       /// Returns true if hour >= 12.
+       
+      bool isValid() const;
 
       int minute() const;
       /// Returns the minute (0 to 59).
@@ -221,7 +223,10 @@ namespace nanogear
 
       void makeLocal(int tzd);
       /// Converts a UTC time into a local time, by applying the given time zone differential.
-
+       
+      static DateTime now();
+      /// Creates a DateTime for the current date and time.
+       
       static bool isLeapYear(int year);
       /// Returns true if the given year is a leap year;
       /// false otherwise.
@@ -331,8 +336,14 @@ namespace nanogear
    {
       return _hour >= 12;
    }
+    
+    
+   inline bool DateTime::isValid() const
+   {
+       return isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond);
+   }
    
-   
+    
    inline int DateTime::minute() const
    {
       return _minute;
@@ -391,7 +402,6 @@ namespace nanogear
    {
       return _utcTime >= dateTime._utcTime;
    }
-   
    
    inline bool DateTime::isLeapYear(int year)
    {

@@ -24,8 +24,6 @@
 #ifndef NUNIFORM_H
 #define NUNIFORM_H
 
-#include <QObject>
-
 #include "nstatus.h"
 #include "nresponse.h"
 
@@ -50,7 +48,7 @@ protected:
      *    will be sent to the client
      */
     virtual void handleGet(const NRequest& request, NResponse& response)
-    { Q_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
+    { N_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
 
     /*!
      * Override this method in a derived class to handle a HEAD request.
@@ -63,7 +61,7 @@ protected:
      *    will be sent to the client
      */
     virtual void handleHead(const NRequest& request, NResponse& response)
-    { Q_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
+    { N_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
 
     /*!
      * Override this method in a derived class to handle a PUT request.
@@ -74,7 +72,7 @@ protected:
      *    will be sent to the client
      */
     virtual void handlePut(const NRequest& request, NResponse& response)
-    { Q_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
+    { N_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
 
     /*!
      * Override this method in a derived class to handle a POST request.
@@ -85,7 +83,7 @@ protected:
      *    will be sent to the client
      */
     virtual void handlePost(const NRequest& request, NResponse& response)
-    { Q_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
+    { N_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
 
     /*!
      * Override this method in a derived class to handle a OPTIONS request.
@@ -96,7 +94,7 @@ protected:
      *    will be sent to the client
      */
     virtual void handleOptions(const NRequest& request, NResponse& response) const
-    { Q_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
+    { N_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
 
     /*!
      * Override this method in a derived class to handle a DELETE request.
@@ -107,7 +105,7 @@ protected:
      *    will be sent to the client
      */
     virtual void handleDelete(const NRequest& request, NResponse& response)
-    { Q_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
+    { N_UNUSED(request) response.setStatus(NStatus::CLIENT_ERROR_METHOD_NOT_ALLOWED); }
 
 private:
    

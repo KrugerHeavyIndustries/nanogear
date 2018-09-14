@@ -12,6 +12,8 @@
 #include <map>
 #include <string>
 
+#include "datetime.h"
+
 class NMimeType;
 
 namespace nanogear

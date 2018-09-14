@@ -13,8 +13,8 @@ namespace nanogear
 {
    using std::string;
    
-   HttpRequestHeader::HttpRequestHeader(int majorVersion, int minorVersion)
-   : map<string, string>(),
+   HttpRequestHeader::HttpRequestHeader(int majorVersion, int minorVersion) :
+      map<string, string>(),
       m_majorVersion(majorVersion),
       m_minorVersion(minorVersion)
    {

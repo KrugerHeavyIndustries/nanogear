@@ -24,16 +24,13 @@
 #ifndef CONNECTORS_IHTTP_NUTILITY_H
 #define CONNECTORS_IHTTP_NUTILITY_H 1
 
-#include <QString>
-#include <QStringList>
-#include <QTextCodec>
-#include <QLocale>
-
 #include <cstdlib>
 
 #include <npreference.h>
 #include <npreferencelist.h>
 #include <nmimetype.h>
+#include <nlocale.h>
+#include <ntextcodec.h>
 
 /**! 
  * Implicit converter to DRY up getPreferenceListFromHeader
@@ -63,12 +60,12 @@ namespace utility
 		};
       
       template<>
-      struct ArgConverter<QLocale>
+      struct ArgConverter<NLocale>
       {
 
          ArgConverter(const std::string& type) : m_member(type) {};
          
-         operator QLocale () { return QLocale(QString::fromStdString(m_member)); }
+         operator NLocale () { return NLocale(m_member); }
          
          std::string m_member;
       };
@@ -118,26 +115,28 @@ namespace utility
  * \arg h The value of an HTTP header.
  */
 template <typename T>
-NPreferenceList<T> getPreferenceListFromHeader(const std::string& h)
+NPreferenceList<T> getPreferenceListFromHeader(const std::string& header)
 {
     NPreferenceList<T> accept;
-
-    std::string header = h;
-   
+    
     std::vector<std::string> list = utility::split(header, ",");
     std::transform(list.begin(), list.end(), std::back_inserter(accept), utility::makePreference<T>);
-   
+    
     return accept;
 }
 
 template <>
-NPreferenceList<QTextCodec*> getPreferenceListFromHeader(const std::string& h)
+NPreferenceList<NTextCodec*> getPreferenceListFromHeader(const std::string& header)
 {
-    NPreferenceList<QTextCodec*> accept;
-    QString header = QString::fromStdString(h);
-    foreach(const QString& item, header.remove(" ").split(",")) {
-        QStringList pair = item.split(";q=");
-        NPreference<QTextCodec*> preference(QTextCodec::codecForName(pair.at(0).toUtf8()), pair.value(1, "1").toFloat());
+    NPreferenceList<NTextCodec*> accept;
+    
+    std::string copy;
+    std::remove_copy(header.begin(), header.end(), copy.begin(), ' ');
+    std::vector<std::string> list = utility::split(copy, ",");
+    
+    for(const std::string& item : list) {
+        std::vector<std::string> pair = utility::split(item, ";q=");
+        NPreference<NTextCodec*> preference(NTextCodec::codecForName(pair.front() /*.toUtf8() */), 1.0f/* pair.back(1, "1").toFloat() */);
         accept.push_back(preference);
     }
 

@@ -26,6 +26,8 @@
 
 #include <string>
 
+#define N_UNUSED(x) (void)x;
+
 /*!
  * \class NMetadata
  * \brief Description of data contained in a resource representation

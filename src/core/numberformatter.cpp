@@ -14,7 +14,7 @@
 //
 
 
-#include "numberFormatter.h"
+#include "numberformatter.h"
 #include <iomanip>
 #if !defined(POCO_NO_LOCALE)
 #include <locale>
@@ -59,26 +59,28 @@ namespace nanogear
    {
       char result[NF_MAX_INT_STRING_LEN];
       std::size_t sz = NF_MAX_INT_STRING_LEN;
-      //intToStr(value, 10, result, sz);
-      str.append(result, sz);
+      std::snprintf(result, sz, "%d", value);
+      str.append(result);
    }
 
 
    void NumberFormatter::append(std::string& str, int value, int width)
    {
+      char fmt[NF_MAX_FMT_STRING_LEN];
       char result[NF_MAX_INT_STRING_LEN];
-      std::size_t sz = NF_MAX_INT_STRING_LEN;
-      //intToStr(value, 10, result, sz, false, width);
-      str.append(result, sz);
+      std::snprintf(fmt, NF_MAX_FMT_STRING_LEN, "%%%dd", width);
+      std::snprintf(result, NF_MAX_INT_STRING_LEN, fmt, value);
+      str.append(result);
    }
 
 
    void NumberFormatter::append0(std::string& str, int value, int width)
    {
+      char fmt[NF_MAX_FMT_STRING_LEN];
       char result[NF_MAX_INT_STRING_LEN];
-      std::size_t sz = NF_MAX_INT_STRING_LEN;
-      //intToStr(value, 10, result, sz, false, width, '0');
-      str.append(result, sz);
+      std::snprintf(fmt, NF_MAX_FMT_STRING_LEN, "%%0%dd", width);
+      std::snprintf(result, NF_MAX_INT_STRING_LEN, fmt, value);
+      str.append(result);
    }
 
 
@@ -103,27 +105,28 @@ namespace nanogear
    void NumberFormatter::append(std::string& str, unsigned value)
    {
       char result[NF_MAX_INT_STRING_LEN];
-      std::size_t sz = NF_MAX_INT_STRING_LEN;
-      //uIntToStr(value, 10, result, sz);
-      str.append(result, sz);
+      std::snprintf(result, NF_MAX_INT_STRING_LEN, "%u", value);
+      str.append(result);
    }
 
 
    void NumberFormatter::append(std::string& str, unsigned value, int width)
    {
+      char fmt[NF_MAX_FMT_STRING_LEN];
       char result[NF_MAX_INT_STRING_LEN];
-      std::size_t sz = NF_MAX_INT_STRING_LEN;
-      //uIntToStr(value, 10, result, sz, false, width);
-      str.append(result, sz);
+      std::snprintf(fmt, NF_MAX_FMT_STRING_LEN, "%%%du", width);
+      std::snprintf(result, NF_MAX_INT_STRING_LEN, fmt, value);
+      str.append(result);
    }
 
 
    void NumberFormatter::append0(std::string& str, unsigned int value, int width)
    {
-      char result[NF_MAX_INT_STRING_LEN];
-      std::size_t sz = NF_MAX_INT_STRING_LEN;
-      //uIntToStr(value, 10, result, sz, false, width, '0');
-      str.append(result, sz);
+       char fmt[NF_MAX_FMT_STRING_LEN];
+       char result[NF_MAX_INT_STRING_LEN];
+       std::snprintf(fmt, NF_MAX_FMT_STRING_LEN, "%%0%du", width);
+       std::snprintf(result, NF_MAX_INT_STRING_LEN, fmt, value);
+       str.append(result);
    }
 
 

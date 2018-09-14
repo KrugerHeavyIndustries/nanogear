@@ -24,10 +24,10 @@
 #ifndef NRESPONSE_H
 #define NRESPONSE_H
 
-#include <QObject>
-#include <QDateTime>
-
 #include "nstatus.h"
+#include "datetime.h"
+
+using nanogear::DateTime;
 
 class NRepresentation;
 
@@ -40,13 +40,13 @@ class NRepresentation;
  * concrete implementation of Server
  */
 
-class NResponse : public QObject
+class NResponse
 {
 public:
     /*!
      * Initializes an invalid response object
      */
-    NResponse() : m_representation(0) {}
+    NResponse() : m_representation(0), m_expires(DateTime::now()) {}
 
     /*!
      * Set the response status code
@@ -90,20 +90,20 @@ public:
      * Set the expiration date for this Response
      * \param expires A QDateTime representing the expiration date
      */
-    void setExpirationDate(const QDateTime& expires)
+    void setExpirationDate(const DateTime& expires)
     { m_expires = expires; }
 
     /*!
      * \return the expiration date of this Response
      */
-    const QDateTime& expirationDate() const
+    const DateTime& expirationDate() const
     { return m_expires; }
 
 private:
     NStatus m_status;
     std::string m_locationRef;
     const NRepresentation* m_representation;
-    QDateTime m_expires;
+    DateTime m_expires;
 };
 
 #endif /* NRESPONSE_H */

@@ -37,6 +37,7 @@
 #endif
 #endif
 
+#include <chrono>
 
 #if defined(_WIN32_WCE)
 
@@ -207,40 +208,8 @@ namespace nanogear {
    
    void Timestamp::update()
    {
-#if defined(POCO_OS_FAMILY_WINDOWS)
-      
-      FILETIME ft;
-#if defined(_WIN32_WCE)
-      GetSystemTimeAsFileTimeWithMillisecondResolution(&ft);
-#else
-      GetSystemTimeAsFileTime(&ft);
-#endif
-      
-      ULARGE_INTEGER epoch; // UNIX epoch (1970-01-01 00:00:00) expressed in Windows NT FILETIME
-      epoch.LowPart  = 0xD53E8000;
-      epoch.HighPart = 0x019DB1DE;
-      
-      ULARGE_INTEGER ts;
-      ts.LowPart  = ft.dwLowDateTime;
-      ts.HighPart = ft.dwHighDateTime;
-      ts.QuadPart -= epoch.QuadPart;
-      m_ts = ts.QuadPart/10;
-      
-#elif defined(POCO_VXWORKS)
-      
-      struct timespec ts;
-      if (clock_gettime(CLOCK_REALTIME, &ts))
-         throw SystemException("cannot get time of day");
-      m_ts = TimeVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
-      
-#else
-      
-      struct timeval tv;
-      if (gettimeofday(&tv, NULL))
-         //throw SystemException("cannot get time of day");
-      m_ts = TimeVal(tv.tv_sec)*resolution() + tv.tv_usec;
-      
-#endif
+       m_ts = std::chrono::duration_cast<std::chrono::microseconds>
+       (std::chrono::system_clock::now().time_since_epoch()).count();
    }
    
    

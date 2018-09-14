@@ -9,8 +9,11 @@
 #include "mongoose_cpp.h"
 #include "nutility.h"
 #include "httpresponseheader.h"
+#include "datetimeformat.h"
+#include "datetimeformatter.h"
 
 #include <nrequest.h>
+#include <nlocale.h>
 #include <nrepresentation.h>
 #include <nclientinfo.h>
 #include <napplication.h>
@@ -91,8 +94,8 @@ namespace nanogear
       NRepresentation entity(message->getContent(), requestHeader["Content-Type"]);
       
       NPreferenceList<NMimeType> acceptedMimeTypes(getPreferenceListFromHeader<NMimeType>(requestHeader["Accept"]));
-      NPreferenceList<QLocale> acceptedLocales(getPreferenceListFromHeader<QLocale>(requestHeader["Accept-Language"]));
-      NPreferenceList<QTextCodec*> acceptedCharsets(getPreferenceListFromHeader<QTextCodec*>(requestHeader["Accept-Charset"]));
+      NPreferenceList<NLocale> acceptedLocales(getPreferenceListFromHeader<NLocale>(requestHeader["Accept-Language"]));
+      NPreferenceList<NTextCodec*> acceptedCharsets(getPreferenceListFromHeader<NTextCodec*>(requestHeader["Accept-Charset"]));
       
       NClientInfo clientInfo(acceptedMimeTypes, acceptedLocales, acceptedCharsets);
       
@@ -114,7 +117,7 @@ namespace nanogear
                                         requestHeader.getMajorVersion(),
                                         requestHeader.getMinorVersion());
       
-      //responseHeader.insert(make_pair("Connection", requestHeader["Connection"]));
+      responseHeader.insert(make_pair("Connection", requestHeader["Connection"]));
      
       if (is_3xx_redirection(response.status().code())) {
          responseHeader.insert(make_pair("Location", response.location()));
@@ -125,10 +128,11 @@ namespace nanogear
             //responseHeader.insert(make_pair("Connection", "close"));
       //}
       
-      //responseHeader.insert(make_pair("Server", "Nanogear"));
+      responseHeader.insert(make_pair("Server", "Nanogear"));
       
       if (response.expirationDate().isValid()) {
-         //responseHeader.insert(make_pair("Expires", responseHeader.getExpirationDate().toUTC());
+          std::string theDate = DateTimeFormatter::format(response.expirationDate(), DateTimeFormat::RFC1123_FORMAT);
+          responseHeader.insert(make_pair("Expires", theDate));
       }
       
       ByteArray responseData;
@@ -140,7 +144,6 @@ namespace nanogear
          } else {
             responseHeader.setContentType(representation->format(clientInfo.acceptedMimeTypes()));
             responseData = representation->data(clientInfo.acceptedMimeTypes());
-          
          }
       }
        

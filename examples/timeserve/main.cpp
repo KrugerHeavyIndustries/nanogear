@@ -25,14 +25,18 @@
 #include <NRouter>
 #include <mongoose/mongoose_cpp.h>
 
+#include "datetimeformat.h"
+#include "datetimeformatter.h"
+
 using namespace nanogear;
 
-class RootResource : public NResource {
+class TimeResource : public NResource {
 public:
-    RootResource() : m_representation("<h1>Simple example</h1><br/><a href=\"/second\">Another resource</a>", "text/html") {}
-
     virtual void handleGet(const NRequest& request, NResponse& response) {
         N_UNUSED(request)
+
+        m_representation.setText(DateTimeFormatter::format(DateTime::now(), DateTimeFormat::RFC1123_FORMAT)); 
+
         response.setStatus(NStatus::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
@@ -41,37 +45,17 @@ private:
     NRepresentation m_representation;
 };
 
-class SecondResource : public NResource {
+class TimeserveApplication : public NApplication {
 public:
-    SecondResource() : m_representation("<h1>Another resource</h1>", "text/html") {}
-
-    virtual void handleGet(const NRequest& request, NResponse& response) {
-        N_UNUSED(request)
-        response.setStatus(NStatus::SUCCESS_OK);
-        response.setRepresentation(&m_representation);
-    }
-
-private:
-    NRepresentation m_representation;
-};
-
-class SimpleApplication : public NApplication {
-public:
-    SimpleApplication(int argc, char** argv) : NApplication(argc, argv) {}
+    TimeserveApplication(int argc, char** argv) : NApplication(argc, argv) {}
     
     virtual NResource* createRoot() {
-        NRouter* router = new NRouter();
-        RootResource* root = new RootResource();
-        SecondResource* secondResource = new SecondResource();
-        router->attach("/", root);
-        router->attach("/second", secondResource);
-        
-        return router;
+        return new TimeResource();
     }
 };
 
 int main(int argc, char** argv) {
-    SimpleApplication app(argc, argv);
+    TimeserveApplication app(argc, argv);
     app.setServer(HTTPServer_Create());
     return app.exec();
 }

@@ -119,6 +119,8 @@ public:
        const std::vector<unsigned char>& d = data("application/html");
        return std::string(d.begin(), d.end());
     }
+
+    void setText(const std::string& text);
    
   private:
    
