@@ -9,16 +9,16 @@ set(nanogear_SRCS
     stringtokenizer.cpp
     timespan.cpp
     directoryiterator.cpp
-    ndirectoryresource.cpp
-    nmethod.cpp
-    ntextcodec.cpp
-    nprotocol.cpp
-    nrepresentation.cpp
-    nresource.cpp
-    nrouter.cpp
-    nstatus.cpp
-    nmimetype.cpp
-    napplication.cpp
+    directoryresource.cpp
+    method.cpp
+    textcodec.cpp
+    protocol.cpp
+    representation.cpp
+    resource.cpp
+    router.cpp
+    status.cpp
+    mimetype.cpp
+    application.cpp
 )
 
 add_library(Nanogear SHARED ${nanogear_SRCS})
@@ -30,7 +30,7 @@ set_target_properties(Nanogear PROPERTIES
 
 include_directories(Nanogear ${Libmagic_INCLUDE_DIR})
 
-target_link_libraries(Nanogear ${Libmagic_LIBRARY} ${QT_LIBRARIES} ${ICONV_LIBRARY})
+target_link_libraries(Nanogear PRIVATE ${Libmagic_LIBRARY} ${QT_LIBRARIES} Iconv::Iconv)
 
 # Install the library
 install(TARGETS Nanogear
@@ -41,14 +41,6 @@ install(TARGETS Nanogear
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION include/Nanogear
     FILES_MATCHING PATTERN *.h
-)
-
-# Install Qt-style headers
-# FIXME: On windows systems this would have a bad
-#        behaviour
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-    DESTINATION include/Nanogear
-    FILES_MATCHING PATTERN N*
 )
 
 add_subdirectory(tests)

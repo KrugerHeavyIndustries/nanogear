@@ -7,16 +7,16 @@
 //
 
 #include "mongoose_cpp.h"
-#include "nutility.h"
+#include "utility.h"
 #include "httpresponseheader.h"
 #include "datetimeformat.h"
 #include "datetimeformatter.h"
 
-#include <nrequest.h>
-#include <nlocale.h>
-#include <nrepresentation.h>
-#include <nclientinfo.h>
-#include <napplication.h>
+#include <request.h>
+#include <locale.h>
+#include <representation.h>
+#include <clientinfo.h>
+#include <application.h>
 #include <bytearray.h>
 
 #include <iostream>
@@ -49,7 +49,7 @@ namespace nanogear
     }
    
     HTTPServer::HTTPServer(int port)
-      :  NServer(port)
+      :  Server(port)
     {
     }
 
@@ -91,26 +91,26 @@ namespace nanogear
    {
       HttpRequestHeader requestHeader = message->getHttpRequestHeader();
 
-      NRepresentation entity(message->getContent(), requestHeader["Content-Type"]);
+      Representation entity(message->getContent(), requestHeader["Content-Type"]);
       
-      NPreferenceList<NMimeType> acceptedMimeTypes(getPreferenceListFromHeader<NMimeType>(requestHeader["Accept"]));
-      NPreferenceList<NLocale> acceptedLocales(getPreferenceListFromHeader<NLocale>(requestHeader["Accept-Language"]));
-      NPreferenceList<NTextCodec*> acceptedCharsets(getPreferenceListFromHeader<NTextCodec*>(requestHeader["Accept-Charset"]));
+      PreferenceList<MimeType> acceptedMimeTypes(getPreferenceListFromHeader<MimeType>(requestHeader["Accept"]));
+      PreferenceList<Locale> acceptedLocales(getPreferenceListFromHeader<Locale>(requestHeader["Accept-Language"]));
+      PreferenceList<TextCodec*> acceptedCharsets(getPreferenceListFromHeader<TextCodec*>(requestHeader["Accept-Charset"]));
       
-      NClientInfo clientInfo(acceptedMimeTypes, acceptedLocales, acceptedCharsets);
+      ClientInfo clientInfo(acceptedMimeTypes, acceptedLocales, acceptedCharsets);
       
-      NRequest request(message->getMethod(), clientInfo, &entity);
+      Request request(message->getMethod(), clientInfo, &entity);
       
       request.setResourceRef(message->getUri());
       request.setParameters(message->getQueryParameters());
       
-      NResponse response;
+      Response response;
       
-      NResource* resource = NApplication::instance()->createRoot();
+      Resource* resource = Application::instance()->createRoot();
       
       resource->handleRequest(request, response);
       
-      const NRepresentation* representation = response.representation();
+      const Representation* representation = response.representation();
       
       HttpResponseHeader responseHeader(response.status().code(),
                                         response.status().name(),
@@ -196,9 +196,9 @@ namespace nanogear
         return unwrap()->uri.len > 0 ? string(unwrap()->uri.p, unwrap()->uri.len) : "";
     }
    
-    NMethod HttpMessage::getMethod() const
+    Method HttpMessage::getMethod() const
     {
-        return NMethod::valueOf(string(unwrap()->method.p, unwrap()->method.len));
+        return Method::valueOf(string(unwrap()->method.p, unwrap()->method.len));
     }
    
     unordered_map<string, string> HttpMessage::getQueryParameters() const

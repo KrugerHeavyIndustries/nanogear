@@ -16,14 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
-
-#include <NApplication>
-#include <NStatus>
-#include <NResponse>
-#include <NRequest>
-#include <NResource>
-#include <NRepresentation>
+#include "application.h"
+#include "status.h"
+#include "response.h"
+#include "request.h"
+#include "resource.h"
+#include "representation.h"
 #include <mongoose/mongoose_cpp.h>
 
 #include <iostream>
@@ -37,9 +35,9 @@ namespace std {
    }
 }
 
-class FormsExample : public NResource {
+class FormsExample : public Resource {
 public:
-    virtual void handleGet(const NRequest& request, NResponse& response) {
+    virtual void handleGet(const Request& request, Response& response) {
        std::ostringstream parametersString;
        std::copy(request.parameters().begin(), request.parameters().end(), std::ostream_iterator<std::pair<std::string, std::string> >(parametersString));
 
@@ -76,23 +74,23 @@ public:
 
         m_representation.setHtml(html.str());
        
-        response.setStatus(NStatus::SUCCESS_OK);
+        response.setStatus(Status::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
 
-    virtual void handlePost(const NRequest& request, NResponse& response) {
+    virtual void handlePost(const Request& request, Response& response) {
         handleGet(request, response);
     }
 private:
    
-    NRepresentation m_representation;
+    Representation m_representation;
 };
 
-class FormsApplication : public NApplication {
+class FormsApplication : public Application {
 public:
-    FormsApplication(int argc, char** argv) : NApplication(argc, argv) {}
+    FormsApplication(int argc, char** argv) : Application(argc, argv) {}
 
-    virtual NResource* createRoot() {
+    virtual Resource* createRoot() {
         return new FormsExample();
     }
 };

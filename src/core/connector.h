@@ -1,6 +1,11 @@
 /*
  * Nanogear - C++ web development framework
  *
+ * This library is based on Restlet (R) <http://www.restlet.org> by Noelios Technologies
+ * Copyright (C) 2005-2008 by Noelios Technologies <http://www.noelios.com>
+ * Restlet is a registered trademark of Noelios Technologies. All other marks and
+ * trademarks are property of their respective owners.
+ *
  * Copyright (C) 2008-2009 Lorenzo Villani.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,33 +21,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "application.h"
-#include "server.h"
+#ifndef CONNECTOR_H
+#define CONNECTOR_H
 
-#include "router.h"
+#include <QList>
+
+#include "protocol.h"
 #include "resource.h"
-#include "representation.h"
-#include "directoryresource.h"
-#include "status.h"
 
-#include <mongoose/mongoose_cpp.h>
-
-using namespace nanogear;
-
-class DirectoryApplication : public Application {
+class Connector : public Resource {
 public:
-    DirectoryApplication(int argc, char** argv) : Application(argc, argv) {}
+    void setProtocols(const QList<Protocol>& protocols)
+    { m_protocols = protocols; }
     
-    virtual Resource* createRoot() {
-        DirectoryResource* directory = new DirectoryResource(".");
-        directory->setIndexName("index.html");
-        return directory;
-    }
+    const QList<Protocol>& getProtocols()
+    { return m_protocols; }
+private:
+    QList m_protocols<Protocol>;
 };
 
-int main(int argc, char** argv) {
-    DirectoryApplication app(argc, argv);
-    app.setServer(HTTPServer_Create());
-    return app.exec();
-}
-
+#endif

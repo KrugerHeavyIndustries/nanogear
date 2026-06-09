@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <NApplication>
-#include <NResource>
-#include <NRequest>
-#include <NResponse>
-#include <NRepresentation>
-#include <NStatus>
-#include <NRouter>
+#include "application.h"
+#include "resource.h"
+#include "request.h"
+#include "response.h"
+#include "representation.h"
+#include "status.h"
+#include "router.h"
 #include <mongoose/mongoose_cpp.h>
 
 #include "datetimeformat.h"
@@ -30,33 +30,33 @@
 
 using namespace nanogear;
 
-class TimeResource : public NResource {
+class TimeResource : public Resource {
 public:
-    virtual void handleGet(const NRequest& request, NResponse& response) {
+    virtual void handleGet(const Request& request, Response& response) {
         N_UNUSED(request)
 
         m_representation.setText(DateTimeFormatter::format(DateTime::now(), DateTimeFormat::RFC1123_FORMAT)); 
 
-        response.setStatus(NStatus::SUCCESS_OK);
+        response.setStatus(Status::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
 
 private:
-    NRepresentation m_representation;
+    Representation m_representation;
 };
 
-class TimeserveApplication : public NApplication {
+class TimeserveApplication : public Application {
 public:
-    TimeserveApplication(int argc, char** argv) : NApplication(argc, argv) {}
+    TimeserveApplication(int argc, char** argv) : Application(argc, argv) {}
     
-    virtual NResource* createRoot() {
+    virtual Resource* createRoot() {
         return new TimeResource();
     }
 };
 
 int main(int argc, char** argv) {
     TimeserveApplication app(argc, argv);
-    app.setServer(HTTPServer_Create());
+    app.setServer(HTTPServer_Create(8090));
     return app.exec();
 }
 
