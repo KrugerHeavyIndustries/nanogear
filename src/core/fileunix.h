@@ -38,7 +38,7 @@ protected:
 	Timestamp getLastModified() const;
 	void setLastModified(const Timestamp& ts);
 	
-   FileSize getSize() const;
+  FileSize getSize() const;
 	void setSize(FileSize size);
 	void setWriteable(bool flag = true);
 	void setExecutable(bool flag = true);

@@ -25,10 +25,12 @@
 #define REPRESENTATION_H
 
 #include <unordered_map>
-#include <vector>
 
+#include "bytearray.h"
 #include "mimetype.h"
 #include "preferencelist.h"
+
+using nanogear::ByteArray;
 
 /*!
  * \class Representation
@@ -47,15 +49,18 @@ public:
     Representation() {}
 
     Representation(const std::string& data, const MimeType& mimeType = MimeType("text/plain"))
-    { setData(mimeType, std::vector<unsigned char>(data.begin(), data.end())); }
+    {
+        auto p = reinterpret_cast<const std::byte*>(data.data());
+        setData(mimeType, ByteArray(p, p + data.size()));
+    }
    
-    Representation(const std::vector<unsigned char>& data, const MimeType& mimeType = MimeType("text/plain"))
+    Representation(const ByteArray& data, const MimeType& mimeType = MimeType("text/plain"))
     { setData(mimeType, data); }
 
     /*!
      * \return the data (in raw form) attached to this representation
      */
-    std::vector<unsigned char> data(const PreferenceList<MimeType>& mimeTypes) const
+    ByteArray data(const PreferenceList<MimeType>& mimeTypes) const
     { return data(format(mimeTypes)); }
 
     /*!
@@ -74,7 +79,7 @@ public:
     /*!
      * \return the data (in raw form) attached to this representation
      */
-   std::vector<unsigned char> data(const MimeType& mimeType) const
+   ByteArray data(const MimeType& mimeType) const
 	{ return m_data.at(mimeType.toString()); }
 
     /*!
@@ -82,8 +87,8 @@ public:
      * \param mimeType A reference to a MimeType
      * \param data A reference to the raw data
      */
-    void setData(const MimeType& mimeType, const std::vector<unsigned char>& data)
-    { m_data.insert(std::pair<std::string, std::vector<unsigned char> >(mimeType.toString(), data)); }
+    void setData(const MimeType& mimeType, const ByteArray& data)
+    { m_data.insert(std::pair<std::string, ByteArray >(mimeType.toString(), data)); }
 
     /*!
      * \return true if the requested format is available
@@ -108,23 +113,23 @@ public:
      */
     std::string xhtml() const
     {
-       const std::vector<unsigned char>& d = data("application/xhtml+xml");
-       return std::string(d.begin(), d.end());
+       const ByteArray& d = data("application/xhtml+xml");
+       return std::string(reinterpret_cast<const char*>(d.data()), d.size());
     }
 
     void setHtml(const std::string& html);
    
     std::string html() const
     {
-       const std::vector<unsigned char>& d = data("application/html");
-       return std::string(d.begin(), d.end());
+       const ByteArray& d = data("application/html");
+       return std::string(reinterpret_cast<const char*>(d.data()), d.size());
     }
 
     void setText(const std::string& text);
    
   private:
    
-   std::unordered_map<std::string, std::vector<unsigned char> > m_data;
+   std::unordered_map<std::string, ByteArray > m_data;
 };
 
 #endif /* REPRESENTATION_H */

@@ -9,11 +9,12 @@
 #ifndef NANOGEAR_BYTEARRAY_H
 #define NANOGEAR_BYTEARRAY_H
 
+#include <cstddef>
 #include <vector>
 
 namespace nanogear
 {
-   typedef std::vector<unsigned char> ByteArray;
+   using ByteArray = std::vector<std::byte>;
 }
-   
+
 #endif
