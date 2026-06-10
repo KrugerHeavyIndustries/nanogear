@@ -17,8 +17,6 @@
 #include "fileunix.h"
 #include "path.h"
 #include "timestamp.h"
-//#include "Poco/Buffer.h"
-//#include "Poco/Exception.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -184,7 +182,7 @@ Timestamp File::created() const
 {
 	//poco_assert (!_path.empty());
 
-#if defined(__APPLE__) && defined(st_birthtime) && !defined(POCO_NO_STAT64) // st_birthtime is available only on 10.5
+#if defined(__APPLE__) && !defined(_DARWIN_FEATURE_64_BIT_INODE)
 	struct stat64 st;
 	if (stat64(_path.c_str(), &st) == 0)
 		return Timestamp::fromEpochTime(st.st_birthtime);

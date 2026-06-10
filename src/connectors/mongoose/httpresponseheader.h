@@ -14,7 +14,7 @@
 
 #include "datetime.h"
 
-class NMimeType;
+class MimeType;
 
 namespace nanogear
 {
@@ -25,7 +25,7 @@ public:
    
    HttpResponseHeader(int status, const std::string& text, int majorVersion, int minorVersion);
    
-   void setContentType(const NMimeType& type);
+   void setContentType(const MimeType& type);
     
    void setContentLength(int bytes);
    

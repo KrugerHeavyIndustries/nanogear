@@ -1,6 +1,6 @@
 #include "mongoose.h"
-#include <nserver.h>
-#include <nmethod.h>
+#include <server.h>
+#include <method.h>
 
 #include <unordered_map>
 #include <vector>
@@ -15,7 +15,7 @@ namespace nanogear
     class HttpMessage;
     class HTTPServer;
 
-    class HTTPServer : public NServer
+    class HTTPServer : public Server
     {
       private:
       
@@ -73,7 +73,7 @@ namespace nanogear
         
         std::string getUri() const;
         
-        NMethod getMethod() const;
+        Method getMethod() const;
         
         HttpRequestHeader getHttpRequestHeader() const;
 

@@ -16,51 +16,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <NApplication>
-#include <NResource>
-#include <NRequest>
-#include <NResponse>
-#include <NRepresentation>
-#include <NStatus>
-#include <NRouter>
+#include "application.h"
+#include "resource.h"
+#include "request.h"
+#include "response.h"
+#include "representation.h"
+#include "status.h"
+#include "router.h"
 #include <mongoose/mongoose_cpp.h>
 
 using namespace nanogear;
 
-class RootResource : public NResource {
+class RootResource : public Resource {
 public:
     RootResource() : m_representation("<h1>Simple example</h1><br/><a href=\"/second\">Another resource</a>", "text/html") {}
 
-    virtual void handleGet(const NRequest& request, NResponse& response) {
+    virtual void handleGet(const Request& request, Response& response) {
         N_UNUSED(request)
-        response.setStatus(NStatus::SUCCESS_OK);
+        response.setStatus(Status::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
 
 private:
-    NRepresentation m_representation;
+    Representation m_representation;
 };
 
-class SecondResource : public NResource {
+class SecondResource : public Resource {
 public:
     SecondResource() : m_representation("<h1>Another resource</h1>", "text/html") {}
 
-    virtual void handleGet(const NRequest& request, NResponse& response) {
+    virtual void handleGet(const Request& request, Response& response) {
         N_UNUSED(request)
-        response.setStatus(NStatus::SUCCESS_OK);
+        response.setStatus(Status::SUCCESS_OK);
         response.setRepresentation(&m_representation);
     }
 
 private:
-    NRepresentation m_representation;
+    Representation m_representation;
 };
 
-class SimpleApplication : public NApplication {
+class SimpleApplication : public Application {
 public:
-    SimpleApplication(int argc, char** argv) : NApplication(argc, argv) {}
+    SimpleApplication(int argc, char** argv) : Application(argc, argv) {}
     
-    virtual NResource* createRoot() {
-        NRouter* router = new NRouter();
+    virtual Resource* createRoot() {
+        Router* router = new Router();
         RootResource* root = new RootResource();
         SecondResource* secondResource = new SecondResource();
         router->attach("/", root);

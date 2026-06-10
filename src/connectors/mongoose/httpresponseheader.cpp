@@ -7,7 +7,7 @@
 //
 
 #include "httpresponseheader.h"
-#include <nmimetype.h>
+#include <mimetype.h>
 
 namespace nanogear
 {
@@ -20,7 +20,7 @@ namespace nanogear
    {
    }
    
-   void HttpResponseHeader::setContentType(const NMimeType& type)
+   void HttpResponseHeader::setContentType(const MimeType& type)
    {
       (*this)["Content-Type"] = type.toString();
    }

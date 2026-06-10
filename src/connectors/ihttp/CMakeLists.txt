@@ -1,6 +1,6 @@
-set(internalhttp_SRCS nhttpserver.cpp)
+set(internalhttp_SRCS httpserver.cpp)
 
-qt4_wrap_cpp(internalhttp_SRCS nhttpserver.h)
+qt4_wrap_cpp(internalhttp_SRCS httpserver.h)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/core)
 
@@ -22,12 +22,6 @@ install(TARGETS NanogearIHTTPConnector
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION include/Nanogear/Connectors/IHTTP
     FILES_MATCHING PATTERN *.h
-)
-
-# Install Qt-style headers
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-    DESTINATION include/Nanogear
-    FILES_MATCHING PATTERN N*
 )
 
 add_subdirectory(tests)

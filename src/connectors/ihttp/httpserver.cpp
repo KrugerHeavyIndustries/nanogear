@@ -1,0 +1,212 @@
+/*
+ * Nanogear - C++ web development framework
+ *
+ * This library is based on Restlet (R) <http://www.restlet.org> by Noelios Technologies
+ * Copyright (C) 2005-2008 by Noelios Technologies <http://www.noelios.com>
+ * Restlet is a registered trademark of Noelios Technologies. All other marks and
+ * trademarks are property of their respective owners.
+ *
+ * Copyright (C) 2008-2009 Lorenzo Villani.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "httpserver.h"
+
+#include <QUrl>
+#include <QTcpSocket>
+#include <QTcpServer>
+#include <QHttpRequestHeader>
+
+#include <method.h>
+#include <request.h>
+#include <response.h>
+#include <resource.h>
+#include <application.h>
+#include <representation.h>
+
+#include "utility.h"
+
+void HTTPServer::start()
+{
+    qDebug() << Q_FUNC_INFO << "Starting HTTP server on " << address() << ":" << port();
+    listen(address(), port());
+    connect(this, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+}
+
+void HTTPServer::onNewConnection()
+{
+    m_clientSocket = nextPendingConnection();
+    connect(m_clientSocket, SIGNAL(readyRead()), SLOT(onClientReadyRead()));
+    connect(m_clientSocket, SIGNAL(disconnected()), m_clientSocket, SLOT(deleteLater()));
+}
+
+void HTTPServer::onClientReadyRead()
+{
+    qDebug() << Q_FUNC_INFO << "Handling request (size:" << m_clientSocket->size() << ")";
+
+    /* ***************************************************************
+     * This part of the method is dedicated to fill the Request object
+     * ***************************************************************/
+    // Separate the HTTP headers from the request body (if any)
+    QByteArray rawRequestHeader;
+
+    for (;;) {
+        QByteArray line(m_clientSocket->readLine());
+
+        if (line == "\r\n")
+            break;
+
+        rawRequestHeader += line;
+    }
+
+    QHttpRequestHeader requestHeader(rawRequestHeader);
+
+    qDebug() << Q_FUNC_INFO << "Requested path: " << requestHeader.path();
+
+    // Fill Method by using informations supplied by the client
+    Method requestedMethod = Method::valueOf(requestHeader.method().toUpper().toStdString());
+
+    //
+    // Get the entity
+    //
+    QByteArray entityBody;
+
+    if (requestHeader.hasKey("Content-Length"))
+        entityBody = m_clientSocket->read(requestHeader.value("Content-Length").toLongLong());
+    else if (requestedMethod.hasBody())
+        entityBody = m_clientSocket->readAll();
+
+    Representation entity(std::vector<unsigned char>(entityBody.begin(), entityBody.end()), requestHeader.value("Content-Type").toStdString());
+
+    PreferenceList<MimeType> acceptedMimeTypes(
+        getPreferenceListFromHeader<MimeType>(requestHeader.value("Accept").toStdString()));
+
+    PreferenceList<QLocale> acceptedLocales(
+        getPreferenceListFromHeader<QLocale>(requestHeader.value("Accept-Language").toStdString()));
+
+    PreferenceList<QTextCodec*> acceptedCharsets(
+        getPreferenceListFromHeader<QTextCodec*>(requestHeader.value("Accept-Charset").toStdString()));
+
+
+    // Fill the ClientInfo object
+    ClientInfo clientInfo(acceptedMimeTypes, acceptedLocales, acceptedCharsets,
+                           requestHeader.value("User-Agent"));
+
+
+    /* ***************************************************************
+     * Query strings
+     * ***************************************************************/
+    std::unordered_map<std::string, std::string> parameters;
+
+    // Overcome the limitations of the Q_FOREACH macro
+    typedef QPair<QByteArray, QByteArray> KeyValuePair;
+
+    QUrl queryString(requestHeader.path());
+
+    foreach(const KeyValuePair& keyValue, queryString.encodedQueryItems()) {
+       parameters[std::string(keyValue.first.data())] = std::string(keyValue.second.data());
+    }
+
+    // Handle POST query string
+    if (entity.hasFormat("application/x-www-form-urlencoded")) {
+        //             ↓ workaround to get QUrl recognize a query string
+       
+        std::vector<unsigned char> urlencoded = entity.data("application/x-www-form-urlencoded");
+       
+       
+       
+       QUrl formData(QString::fromStdString("?" + std::string(urlencoded.begin(), urlencoded.end())));
+        foreach(const KeyValuePair& keyValue, formData.encodedQueryItems()) {
+           parameters[std::string(keyValue.first.data())] = std::string(keyValue.second.data());
+        }
+    }
+
+    // Fill Request object
+    Request request(requestHeader.method().toStdString(), clientInfo, &entity);
+
+    request.setResourceRef(queryString.path().toStdString());
+
+    request.setParameters(parameters);
+
+
+    /* ***************************************************************
+     * Handle the request
+     * ***************************************************************/
+    // Let the Application's root() handle routing (if a Router class) or let
+    // it respond at every uri, if needed
+    qDebug() << Q_FUNC_INFO << "Handling the request";
+
+    Response response;
+
+    Resource* resource = Application::instance()->createRoot();
+
+    resource->handleRequest(request, response);
+
+
+
+    /* *******************************************************************
+     * Extract data from the Response object and answer back to the client
+     * *******************************************************************/
+    // Retrieve the representation from the response
+    //! \note This should be wrapped in a QPointer<T>
+    const Representation* representation = response.representation();
+
+    /// \note Unused
+    //QTextCodec* codec = clientInfo.acceptedTextCodecs().top();
+
+	QHttpResponseHeader responseHeader(response.status().code(), QString::fromStdString(response.status().name()),
+                                       requestHeader.majorVersion(), requestHeader.minorVersion());
+
+    responseHeader.setValue("Connection", requestHeader.value("Connection"));
+
+    if (responseHeader.value("Connection").isEmpty()) {
+        if (responseHeader.majorVersion() <= 1 && responseHeader.minorVersion() == 0)
+            responseHeader.setValue("Connection", "close");
+    }
+
+    responseHeader.setValue("Server", "Nanogear");
+
+    if (response.expirationDate().isValid()) {
+        responseHeader.setValue("Expires", response.expirationDate().toUTC()
+                                .toString("dd MMM yyyy ss:mm:hh") + " GMT");
+    }
+
+    // If the resource provides only one representation send it anyway
+    QByteArray responseData;
+
+    if (representation != 0) { // the resource may or may not return a representation
+        if (representation->formats().size() == 1) {
+            responseHeader.setContentType(QString::fromStdString(representation->formats().at(0).toString()));
+            std::vector<unsigned char> data = representation->data(representation->formats().at(0).toString());
+            responseData = QByteArray(reinterpret_cast<const char*>(data.data()), data.size());
+        } else {
+			   responseHeader.setContentType(QString::fromStdString(representation->format(clientInfo.acceptedMimeTypes())
+                                          .toString()));
+            std::vector<unsigned char> data = representation->data(clientInfo.acceptedMimeTypes());
+            responseData = QByteArray(reinterpret_cast<const char*>(data.data()), data.size());
+        }
+    }
+
+    responseHeader.setValue("Content-Length", QString::number(responseData.length()));
+
+    // And finally send data back to the client
+    qDebug() << Q_FUNC_INFO << "sending data back to the client (size:"
+    << responseHeader.value("Content-Length") << ") -" << responseHeader.value("Content-Type");
+
+    m_clientSocket->write(responseHeader.toString().toUtf8());
+    m_clientSocket->write(responseData);
+    m_clientSocket->disconnectFromHost();
+
+    delete resource; // Clean-up
+}
