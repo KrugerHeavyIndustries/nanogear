@@ -20,11 +20,17 @@ After cloning the repository make a parallel build directory
 
 ### Macintosh 
 
+#### With Unix Makefiles
+
 ```bash
-mkdir nanogear_build
-cd nanogear_build 
-cmake -G Xcode -DWITH_EXAMPLES=1 ..
-open nanogear.xcodeproj
+cmake -B build -G "Unix Makefiles" -DWITH_EXAMPLES=1
+cmake --build build --parallel 1 -v
+```
+
+#### With Xcode
+```bash
+cmake -B build -G Xcode -DWITH_EXAMPLES=1 ..
+open build/nanogear.xcodeproj
 ```
 
 Hack away
