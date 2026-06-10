@@ -22,7 +22,6 @@
  */
 
 #include "representation.h"
-#include "bytearray.h"
 
 #include <iterator>
 
@@ -42,7 +41,8 @@ namespace
 
 void Representation::setXhtml(const string& xhtml)
 {
-    setData("application/xhtml+xml", ByteArray(xhtml.begin(), xhtml.end()));
+    auto p = reinterpret_cast<const std::byte*>(xhtml.data());
+    setData("application/xhtml+xml", ByteArray(p, p + xhtml.size()));
 
     string html = xhtml;
     //QRegExp fix;
@@ -158,12 +158,14 @@ void Representation::setXhtml(const string& xhtml)
 
 void Representation::setHtml(const string& html)
 {
-   setData("text/html", ByteArray(html.begin(), html.end()));
+   auto p = reinterpret_cast<const std::byte*>(html.data());
+   setData("text/html", ByteArray(p, p + html.size()));
 }
 
 void Representation::setText(const string& text)
 {
-   setData("text/plain", ByteArray(text.begin(), text.end()));
+   auto p = reinterpret_cast<const std::byte*>(text.data());
+   setData("text/plain", ByteArray(p, p + text.size()));
 }
 
 std::vector<MimeType> Representation::formats() const

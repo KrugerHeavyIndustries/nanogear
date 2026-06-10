@@ -1,9 +1,9 @@
 #include "mongoose.h"
 #include <server.h>
 #include <method.h>
+#include <bytearray.h>
 
 #include <unordered_map>
-#include <vector>
 
 #include "httprequestheader.h"
 #include "httpresponseheader.h"
@@ -52,7 +52,7 @@ namespace nanogear
       
          void sendHttpResponseHeader(const HttpResponseHeader& responseHeader) const;
 
-         void sendData(const std::vector<unsigned char>& data) const;
+         void sendData(const ByteArray& data) const;
         
          void close() const;
     };
