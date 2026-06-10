@@ -66,7 +66,7 @@ void DirectoryResource::handleGet(const Request& request, Response& response)
             } else if (m_indexAllowed) {
                 // Return an HTML representation of this directory
 
-                std::ostringstream htmlTableEntries;
+                string htmlTableEntries;
                 std::vector<File> files;
                 pathInfo.list(files);
                
@@ -74,7 +74,7 @@ void DirectoryResource::handleGet(const Request& request, Response& response)
                 for (; dirFile != files.end(); ++dirFile) {
                    string fileType("File");
                    string dirIdentifier("");
-                   string size;
+                   string size = std::to_string(dirFile->getSize());
                    
                    if (dirFile->isDirectory()) {
                       fileType = "Directory";
@@ -83,19 +83,18 @@ void DirectoryResource::handleGet(const Request& request, Response& response)
                    }
                    
                    string arg1 = pathInfo.path() + "/" + dirFile->path();
-                   string arg2 = dirFile->path();
+                   string arg2 = Path(dirFile->path()).getFileName();
                    string arg3 = dirIdentifier;
-                   
-                   htmlTableEntries <<	"<tr>"
-                   "<td class=\"n\"><a href=\"" << "arg1" << "\">" << "arg2" << "</a>" << "arg3" << "</td>" <<
-                   "<td class=\"m\">" << DateTimeFormatter::format(dirFile->getLastModified(), DateTimeFormat::ISO8601_FORMAT) << "</td>" <<
-                   "<td class=\"s\">" << dirFile->getSize() << "</td>" <<
-                   "<td class=\"t\">" << fileType << "</td>"
-                   "</tr>\n";
 
+                   htmlTableEntries.append("<tr>");
+                   htmlTableEntries.append("<td class=\"n\"><a href=\"" + arg1 + "\">" + arg2 + "</a>" + arg3 + "</td>");
+                   htmlTableEntries.append("<td class=\"m\">" + DateTimeFormatter::format(dirFile->getLastModified(), DateTimeFormat::ISO8601_FORMAT) + "</td>");
+                   htmlTableEntries.append("<td class=\"s\">" + size + "</td>");
+                   htmlTableEntries.append("<td class=\"t\">" + fileType + "</td>");
+                   htmlTableEntries.append("</tr>\n");
                 }
-               
-                m_directoryIndex.setXhtml(xhtmlRepresentation(pathInfo.path(), htmlTableEntries.str()));
+
+                m_directoryIndex.setXhtml(xhtmlRepresentation(pathInfo.path(), htmlTableEntries));
 
                 response.setStatus(Status::SUCCESS_OK);
                 response.setRepresentation(&m_directoryIndex);
