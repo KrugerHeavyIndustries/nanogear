@@ -30,7 +30,7 @@ set_target_properties(Nanogear PROPERTIES
 
 include_directories(Nanogear ${Libmagic_INCLUDE_DIR})
 
-target_link_libraries(Nanogear PRIVATE ${Libmagic_LIBRARY} ${QT_LIBRARIES} Iconv::Iconv)
+target_link_libraries(Nanogear PRIVATE ${Libmagic_LIBRARY})
 
 # Install the library
 install(TARGETS Nanogear

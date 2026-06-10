@@ -8,7 +8,6 @@ message(STATUS "This is Nanogear ${NANOGEAR_MAJOR}.${NANOGEAR_MINOR}.${NANOGEAR_
 option(WITH_EXAMPLES "WITH_EXAMPLES" OFF)
 
 find_package(Libmagic REQUIRED)
-find_package(Iconv REQUIRED)
 
 #
 # Build documentation if doxygen and graphviz are found
