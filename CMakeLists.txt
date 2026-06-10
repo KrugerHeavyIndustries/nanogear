@@ -6,8 +6,22 @@ include(NanogearVersion)
 message(STATUS "This is Nanogear ${NANOGEAR_MAJOR}.${NANOGEAR_MINOR}.${NANOGEAR_PATCH}")
 
 option(WITH_EXAMPLES "WITH_EXAMPLES" OFF)
+option(WITH_TESTS "WITH_TESTS" ON)
 
 find_package(Libmagic REQUIRED)
+
+if (${WITH_TESTS})
+    include(FetchContent)
+    FetchContent_Declare(
+        doctest
+        GIT_REPOSITORY https://github.com/doctest/doctest.git
+        GIT_TAG v2.4.11
+        OVERRIDE_FIND_PACKAGE
+    )
+    set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
+    FetchContent_MakeAvailable(doctest)
+    enable_testing()
+endif (${WITH_TESTS})
 
 #
 # Build documentation if doxygen and graphviz are found
