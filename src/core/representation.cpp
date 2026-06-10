@@ -24,18 +24,13 @@
 #include "representation.h"
 #include "bytearray.h"
 
-#include <iconv.h>
-#include <errno.h>
 #include <iterator>
-
-#define OUTBUFLEN 4096
 
 using nanogear::ByteArray;
 using std::string;
 using std::vector;
 using std::pair;
 using std::back_inserter;
-using std::logic_error;
 
 namespace
 {
@@ -47,33 +42,7 @@ namespace
 
 void Representation::setXhtml(const string& xhtml)
 {
-    char outbuf[OUTBUFLEN];
-   
-    size_t inbytesleft = xhtml.size();
-    size_t outbytesleft = OUTBUFLEN;
-   
-    char* inptr = const_cast<char*>(xhtml.c_str());
-    char* outptr = outbuf;
-   
-    iconv_t cd = iconv_open("UTF-8", "ASCII");
-   
-    if (iconv(cd, &inptr, &inbytesleft, &outptr, &outbytesleft) == -1)
-    {
-        switch (errno) {
-            case EILSEQ:
-                throw logic_error("An invalid multibyte sequence was encountered in the input.");
-            case EINVAL:
-                throw logic_error("An incomplete multibyte sequence was encountered in the input.");
-            case E2BIG:
-                throw logic_error("The output buffer has no more room for the next converted character.");
-            default:
-                throw logic_error("An unknown error occured.");
-        }
-    }
-
-    setData("application/xhtml+xml", ByteArray(outbuf, outbuf + (OUTBUFLEN - outbytesleft)));
-   
-    iconv_close(cd);
+    setData("application/xhtml+xml", ByteArray(xhtml.begin(), xhtml.end()));
 
     string html = xhtml;
     //QRegExp fix;
